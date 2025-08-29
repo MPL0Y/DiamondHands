@@ -1,0 +1,10 @@
+<vmap:VMAP xmlns:vmap="http://www.iab.net/videosuite/vmap" version="1.0">
+  <!-- Preroll -->
+  <vmap:AdBreak timeOffset="start" breakType="linear" breakId="preroll-1">
+    <vmap:AdSource id="src-1" allowMultipleAds="false" followRedirects="true">
+      <vmap:AdTagURI templateType="vast3">
+        <![CDATA[https://raw.githubusercontent.com/MPL0Y/DiamondHands/refs/heads/main/vast.xml]]>
+      </vmap:AdTagURI>
+    </vmap:AdSource>
+  </vmap:AdBreak>
+</vmap:VMAP>
