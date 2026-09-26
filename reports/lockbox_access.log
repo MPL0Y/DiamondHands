@@ -70,3 +70,6 @@ current-window selection of E0607 for signal generator (full data)
 2026-09-26 08:30:47.503605+00:00 LOAD lockbox bars tf=1h
 2026-09-26 08:30:47.680606+00:00 LOAD lockbox bars tf=4h
 2026-09-26 08:30:48.219030+00:00 LOAD lockbox bars tf=1d
+2026-09-26 08:46:26.219334+00:00 LOAD lockbox bars tf=1h
+2026-09-26 08:46:26.708390+00:00 LOAD lockbox bars tf=4h
+2026-09-26 08:46:27.429833+00:00 LOAD lockbox bars tf=1d
