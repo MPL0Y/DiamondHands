@@ -1,0 +1,14 @@
+{
+ "id": "E0139",
+ "family": "trend",
+ "venue": "delta_india_perp",
+ "hypothesis": "User request: TradingView Supertrend (ATR 10, x3.0, hl2, RMA ATR) on daily bars. Long on up-trend. Variants add flat vs short on down-trend, a WF-tuned grid, vol-targeting and leverage.",
+ "lev": 2.0,
+ "strategy": "supertrend",
+ "tf": "1d",
+ "fixed": {
+  "period": 10,
+  "mult": 3.0,
+  "side": "long"
+ }
+}
