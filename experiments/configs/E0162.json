@@ -1,0 +1,34 @@
+{
+ "id": "E0162",
+ "venue": "delta_india_perp",
+ "hypothesis": "Sizing overlay: vol-targeting / DD-delevering / half-Kelly should cut the drawdowns of the best raw signals below 50%, so leverage can raise the median month within the risk limits.",
+ "family": "mean_reversion",
+ "strategy": "intraday_rev",
+ "tf": "15m",
+ "grid": {
+  "lookback": [
+   4,
+   8,
+   16
+  ],
+  "thresh": [
+   0.02,
+   0.04,
+   0.06
+  ],
+  "hold": [
+   8,
+   24,
+   48
+  ]
+ },
+ "fixed": {
+  "side": "long"
+ },
+ "lev": 1.0,
+ "overlay": {
+  "vol_target": 0.6,
+  "vol_n": 2880,
+  "vt_cap": 3.0
+ }
+}
