@@ -1,0 +1,56 @@
+{
+ "id": "E0427",
+ "family": "calendar",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Calendar 2: turn-of-month flows (Kaiser 2019) and US-session drift, with a trend filter so the effects are only harvested in up-regimes.",
+ "strategy": "calendar",
+ "tf": "1h",
+ "grid": {
+  "hours": [
+   [
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+   ],
+   [
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+   ],
+   [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   [
+    20,
+    21,
+    22,
+    23
+   ]
+  ],
+  "trend": [
+   1200,
+   2400
+  ]
+ },
+ "fixed": {
+  "side": "long"
+ }
+}
