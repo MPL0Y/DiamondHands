@@ -1,0 +1,25 @@
+{
+ "id": "E0393",
+ "venue": "delta_india_perp",
+ "hypothesis": "[rerun of E0181 after FX fix] Fractional leverage: the highest-median funding/grid signals fail only on DD (51-70%). Scaling exposure to 0.5-0.85x should bring OOS DD under 50% while keeping most of the median.",
+ "lev": 0.5,
+ "family": "funding",
+ "strategy": "funding_level",
+ "tf": "1h",
+ "grid": {
+  "hi": [
+   5e-05,
+   0.0001,
+   0.0002,
+   0.0004,
+   0.001
+  ],
+  "lo": [
+   -1,
+   0.0
+  ]
+ },
+ "fixed": {
+  "base": "none"
+ }
+}
