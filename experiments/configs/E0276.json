@@ -1,0 +1,29 @@
+{
+ "id": "E0276",
+ "family": "mean_reversion",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "[rerun of E0064 after FX fix] Mean reversion: short-horizon BTC returns show reversal after extremes (e.g. Wen et al. 2022 intraday; practitioner RSI(2) evidence). Oversold entries should earn a positive median.",
+ "strategy": "intraday_rev",
+ "tf": "15m",
+ "grid": {
+  "lookback": [
+   4,
+   8,
+   16
+  ],
+  "thresh": [
+   0.02,
+   0.04,
+   0.06
+  ],
+  "hold": [
+   8,
+   24,
+   48
+  ]
+ },
+ "fixed": {
+  "side": "long"
+ }
+}
