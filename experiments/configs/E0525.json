@@ -1,0 +1,10 @@
+{
+ "id": "E0525",
+ "family": "benchmark",
+ "strategy": "hold",
+ "tf": "4h",
+ "hypothesis": "Benchmark top-up: passive BTC exposure at 0.5-5x, spot vs perp, never/banded rebalancing. Defines what 'no skill' earns at each risk level.",
+ "venue": "coindcx_spot",
+ "lev": 1.0,
+ "band": 0.0
+}
