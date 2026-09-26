@@ -1,0 +1,44 @@
+{
+ "id": "E0108",
+ "family": "calendar",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Calendar: BTC shows intraday and weekday seasonality (e.g. US-session and weekend effects; Baur et al. 2019; Aharon & Qadan 2019).",
+ "strategy": "calendar",
+ "tf": "1h",
+ "grid": {
+  "weekdays": [
+   [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ]
+  ]
+ },
+ "fixed": {
+  "side": "long",
+  "hours": [
+   21,
+   22,
+   23,
+   0,
+   1,
+   2
+  ]
+ }
+}
