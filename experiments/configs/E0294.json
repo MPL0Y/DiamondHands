@@ -1,0 +1,29 @@
+{
+ "id": "E0294",
+ "family": "volatility",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "[rerun of E0082 after FX fix] Volatility: range expansion starts moves (Crabel/Williams volatility breakout). Trend works better in low-vol regimes (vol-managed portfolios, Moreira & Muir 2017).",
+ "strategy": "vol_regime",
+ "tf": "1d",
+ "grid": {
+  "fast": [
+   10,
+   20
+  ],
+  "slow": [
+   50,
+   100
+  ],
+  "vol_q": [
+   0.5,
+   0.7,
+   0.85
+  ]
+ },
+ "fixed": {
+  "mode": "trend_lowvol",
+  "vol_n": 20,
+  "q_window": 365
+ }
+}
