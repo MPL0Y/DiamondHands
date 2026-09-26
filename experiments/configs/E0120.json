@@ -1,0 +1,25 @@
+{
+ "id": "E0120",
+ "family": "funding_carry",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Funding carry: long spot + short perp collects positive funding (BTC perps averaged ~10-15%/yr, Binance 2020-25). It is delta-neutral, so it should give a very high share of positive months.",
+ "strategy": "carry",
+ "tf": "4h",
+ "grid": {
+  "window": [
+   3,
+   7,
+   21,
+   60
+  ],
+  "enter": [
+   5e-05,
+   0.00015,
+   0.0003
+  ]
+ },
+ "fixed": {
+  "levp": 2
+ }
+}
