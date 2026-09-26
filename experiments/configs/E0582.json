@@ -1,0 +1,18 @@
+{
+ "id": "E0582",
+ "family": "combo",
+ "strategy": "combo_wf",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Execution: post a maker limit at the signal bar's close (fee 0.0236% vs ~0.11% taker+slippage). Fills only if the next bar trades >=1bp through the limit; otherwise a market order at the following open. Walk-forward selection also sees the lower costs. [limit-execution rerun of E0528]",
+ "tf": "4h",
+ "fixed": {
+  "long_metric": "return",
+  "long_k": 5,
+  "long_ty": 4,
+  "short_metric": "sortino",
+  "short_k": 1,
+  "short_ty": 4
+ },
+ "exec": "limit"
+}
