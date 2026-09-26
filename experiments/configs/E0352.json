@@ -1,0 +1,14 @@
+{
+ "id": "E0352",
+ "family": "trend",
+ "strategy": "supertrend",
+ "tf": "1d",
+ "fixed": {
+  "period": 10,
+  "mult": 3.0,
+  "side": "long"
+ },
+ "lev": 1.0,
+ "venue": "coindcx_spot",
+ "hypothesis": "[rerun of E0140 after FX fix] User Supertrend on CoinDCX spot: long-only avoids perp funding, which cost 11x the fees on Delta."
+}
