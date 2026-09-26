@@ -1,0 +1,38 @@
+{
+ "id": "E0463",
+ "family": "calendar",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Literature (QuantPedia): long BTC 21:00-23:00 UTC -> 40.6%/yr, Calmar 1.79. Test with Delta costs and a walk-forward over neighbouring windows/weekdays.",
+ "strategy": "calendar",
+ "tf": "1h",
+ "grid": {
+  "weekdays": [
+   [
+    3,
+    4,
+    5,
+    6
+   ],
+   [
+    4
+   ],
+   [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ]
+  ]
+ },
+ "fixed": {
+  "side": "long",
+  "hours": [
+   21,
+   22
+  ]
+ }
+}
