@@ -36,7 +36,8 @@ def _perturb(v, f):
     if isinstance(v, bool) or not isinstance(v, (int, float)):
         return v
     if isinstance(v, int):
-        return max(1, int(round(v * f)))
+        r = int(round(v * f))
+        return max(1, r) if v > 0 else r
     return v * f
 
 

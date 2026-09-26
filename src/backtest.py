@@ -58,7 +58,11 @@ def train_score(eq, how):
     return s
 
 
-def windows(start=OOS_START, end=DEV_END, test_months=6):
+def windows(start=OOS_START, end=None, test_months=6):
+    from src.data import MODE
+    from src.config import LOCKBOX_END
+    if end is None:
+        end = LOCKBOX_END if MODE["lockbox"] else DEV_END
     out = []
     a = start
     while a < end:
@@ -112,10 +116,10 @@ REGIMES = [("2018", "2018-01-01", "2019-01-01"), ("2019", "2019-01-01", "2020-01
            ("2025+", "2025-01-01", "2030-01-01")]
 
 
-def evaluate(df_full, arrays, venue, trail=0.0, band=0.0, mc_runs=5000, extra=True, simfn=None):
-    """Evaluate OOS arrays over [OOS_START, end). Returns metrics dict + series."""
+def evaluate(df_full, arrays, venue, trail=0.0, band=0.0, mc_runs=5000, extra=True, simfn=None, start=None):
+    """Evaluate OOS arrays over [start (default OOS_START), end). Returns metrics dict + series."""
     simfn = simfn or target_sim
-    i0 = df_full.index.searchsorted(OOS_START)
+    i0 = df_full.index.searchsorted(OOS_START if start is None else start)
     df = df_full.iloc[i0:]
     arr = slice_arr(arrays, i0, len(df_full))
     comp = simfn(df, arr, venue, 0, False, 0, trail, band)

@@ -6,10 +6,15 @@ import pandas as pd
 from src.config import PROC, DEV_END, LOCKBOX_DIR, ROOT
 
 PERP_FROM = pd.Timestamp("2020-01-01", tz="UTC")
+MODE = {"lockbox": False}      # set True ONLY by src/lockbox.py (Section 8); every lockbox load is logged
+
+
+def bars(tf: str, lockbox=None) -> pd.DataFrame:
+    return _bars(tf, MODE["lockbox"] if lockbox is None else lockbox)
 
 
 @lru_cache(maxsize=16)
-def bars(tf: str, lockbox: bool = False) -> pd.DataFrame:
+def _bars(tf: str, lockbox: bool = False) -> pd.DataFrame:
     """Execution bars: Binance spot before 2020-01-01, Binance USD-M perp afterwards
     (Delta India trades a perp; perp wicks are larger, which is conservative for liquidation).
     Adds: fund (sum of 8h funding stamped inside the bar), fx (USDINR), month_id, spot_close."""
@@ -48,14 +53,22 @@ def long_daily(tf="1d"):
     return pd.read_parquet(PROC / f"{nm}.parquet")
 
 
-@lru_cache(maxsize=2)
 def funding_series():
-    return pd.read_parquet(PROC / "funding.parquet")["rate"]
+    return _funding(MODE["lockbox"])
 
 
 @lru_cache(maxsize=2)
+def _funding(lb):
+    return pd.read_parquet((LOCKBOX_DIR / "processed" if lb else PROC) / "funding.parquet")["rate"]
+
+
 def fng():
-    return pd.read_parquet(PROC / "fng.parquet")["value"]
+    return _fng(MODE["lockbox"])
+
+
+@lru_cache(maxsize=2)
+def _fng(lb):
+    return pd.read_parquet((LOCKBOX_DIR / "processed" if lb else PROC) / "fng.parquet")["value"]
 
 
 @lru_cache(maxsize=2)

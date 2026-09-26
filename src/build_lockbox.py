@@ -60,6 +60,11 @@ def main():
     f = f[f.index < LOCKBOX_END].to_frame()
     f.to_parquet(out / "funding.parquet")
     rep.append(f"- funding prints in lockbox: {(f.index >= LOCKBOX_START).sum()} (Binance to {b.index.max()}, BitMEX after)")
+    fj = json.loads(get("https://api.alternative.me/fng/?limit=0&format=json"))["data"]
+    fg = pd.DataFrame(fj)
+    fg.index = pd.to_datetime(fg["timestamp"].astype(int), unit="s", utc=True)
+    fg = fg[["value"]].astype(float).sort_index()
+    fg[fg.index < LOCKBOX_END].to_parquet(out / "fng.parquet")
     fx = pd.read_parquet(PROC / "usdinr.parquet")
     fx.to_parquet(out / "usdinr.parquet")
     (ROOT / "reports" / "lockbox_data_quality.md").write_text("\n".join(rep) + "\n")
