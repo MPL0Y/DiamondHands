@@ -1,0 +1,26 @@
+{
+ "id": "E0603",
+ "family": "ensemble",
+ "strategy": "ensemble",
+ "tf": "1h",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "exec": "limit_eval",
+ "hypothesis": "Blend 4 (limit execution): combine the full-period winner (combo L/S + E0449) with the multi-rule combo system, which was strongest in the recent bear year. Goal: keep the long-run profit and add recent robustness. ['E0528', 'E0529', 'E0530', 'E0449']",
+ "grid": {
+  "weighting": [
+   "equal",
+   "invvol"
+  ]
+ },
+ "fixed": {
+  "components": [
+   "E0528",
+   "E0529",
+   "E0530",
+   "E0449"
+  ],
+  "lev": 1.0,
+  "step": 0.25
+ }
+}
