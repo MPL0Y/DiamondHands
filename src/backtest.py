@@ -68,40 +68,42 @@ def windows(start=OOS_START, end=DEV_END, test_months=6):
     return out
 
 
-def walk_forward(df, cfg_targets, venue, score="median_month", train_years=3, test_months=6, min_train_days=120,
-                 trail_of=None, band=0.0):
-    """cfg_targets: list of dicts {params, target, stop, tp, trail}. Targets already include leverage.
-    Returns stitched arrays + per-window selections. Only data before each window is used to select."""
-    n = len(df)
+def target_sim(df, arr, venue, mode, lotfree=False, delay=0, trail=0.0, band=0.0):
+    return sim(df, arr["target"], venue, mode, arr.get("stop"), arr.get("tp"), trail, band, lotfree, delay)
+
+
+def slice_arr(arr, i, j):
+    return {k: (None if v is None else v[i:j]) for k, v in arr.items()}
+
+
+def walk_forward(df, cands, venue, score="median_month", train_years=3, test_months=6, min_train_days=120,
+                 simfn=None, trail=0.0, band=0.0):
+    """cands: list of dicts {params, arrays: {name: np.ndarray|None}}. Returns stitched arrays + selections.
+    Selection for each OOS window uses only data strictly before that window (rolling train_years)."""
+    simfn = simfn or target_sim
     idx = df.index
-    stitched = np.zeros(n)
-    st_stop, st_tp, st_trail = np.zeros(n), np.zeros(n), np.zeros(n)
+    keys = set().union(*[c["arrays"].keys() for c in cands])
+    stitched = {k: None for k in keys}
+    for k in keys:
+        if any(c["arrays"].get(k) is not None for c in cands):
+            stitched[k] = np.zeros(len(df))
     sel = []
     for a, b in windows(test_months=test_months):
         tr0 = max(idx[0], a - pd.DateOffset(years=train_years))
         i0, i1, i2 = idx.searchsorted(tr0), idx.searchsorted(a), idx.searchsorted(b)
-        if (a - tr0).days < min_train_days or len(cfg_targets) == 1:
-            best = 0 if len(cfg_targets) == 1 else None
+        if len(cands) == 1 or (a - tr0).days < min_train_days:
+            best = 0
         else:
-            best = None
-        if best is None:
             sub = df.iloc[i0:i1]
-            scores = []
-            for k, c in enumerate(cfg_targets):
-                r = sim(sub, c["target"][i0:i1], venue, 0,
-                        None if c.get("stop") is None else c["stop"][i0:i1],
-                        None if c.get("tp") is None else c["tp"][i0:i1], c.get("trail", 0.0), band, lotfree=True)
-                scores.append(train_score(r["eq"], score))
+            scores = [train_score(simfn(sub, slice_arr(c["arrays"], i0, i1), venue, 0, True, 0, trail, band)["eq"], score)
+                      for c in cands]
             best = int(np.nanargmax(scores))
-        c = cfg_targets[best]
-        stitched[i1:i2] = c["target"][i1:i2]
-        if c.get("stop") is not None:
-            st_stop[i1:i2] = c["stop"][i1:i2]
-        if c.get("tp") is not None:
-            st_tp[i1:i2] = c["tp"][i1:i2]
+        for k in keys:
+            v = cands[best]["arrays"].get(k)
+            if stitched[k] is not None and v is not None:
+                stitched[k][i1:i2] = v[i1:i2]
         sel.append((str(a.date()), best))
-    trails = {c.get("trail", 0.0) for c in cfg_targets}
-    return stitched, st_stop, st_tp, sel
+    return stitched, sel
 
 
 REGIMES = [("2018", "2018-01-01", "2019-01-01"), ("2019", "2019-01-01", "2020-01-01"),
@@ -110,19 +112,18 @@ REGIMES = [("2018", "2018-01-01", "2019-01-01"), ("2019", "2019-01-01", "2020-01
            ("2025+", "2025-01-01", "2030-01-01")]
 
 
-def evaluate(df_full, target, venue, stop=None, tp=None, trail=0.0, band=0.0, mc_runs=5000, extra=True):
-    """Evaluate an OOS target over [OOS_START, end of df). Returns metrics dict + series."""
+def evaluate(df_full, arrays, venue, trail=0.0, band=0.0, mc_runs=5000, extra=True, simfn=None):
+    """Evaluate OOS arrays over [OOS_START, end). Returns metrics dict + series."""
+    simfn = simfn or target_sim
     i0 = df_full.index.searchsorted(OOS_START)
     df = df_full.iloc[i0:]
-    tg = np.asarray(target)[i0:]
-    sp = None if stop is None else np.asarray(stop)[i0:]
-    tpp = None if tp is None else np.asarray(tp)[i0:]
-    comp = sim(df, tg, venue, 0, sp, tpp, trail, band)
-    wd = sim(df, tg, venue, 1, sp, tpp, trail, band)
-    lf = sim(df, tg, venue, 1, sp, tpp, trail, band, lotfree=True)
+    arr = slice_arr(arrays, i0, len(df_full))
+    comp = simfn(df, arr, venue, 0, False, 0, trail, band)
+    wd = simfn(df, arr, venue, 1, False, 0, trail, band)
+    lf = simfn(df, arr, venue, 1, True, 0, trail, band)
     mi = month_index(df)
     m = perf(comp["eq"], df.fx, wd["m_pnl"], mi, comp["trades"], lf["m_pnl"])
-    m["exposure"] = float((comp["pos"] != 0).mean())
+    m["exposure"] = float((np.asarray(comp["pos"]) != 0).mean())
     m["liquidations_compound"] = int(comp["nliq"])
     m["liquidations_withdraw"] = int(wd["nliq"])
     m["fees_usd"] = float(comp["fees"])
@@ -133,31 +134,29 @@ def evaluate(df_full, target, venue, stop=None, tp=None, trail=0.0, band=0.0, mc
     r = daily_returns(comp["eq"])
     tr = comp["trades"][:, 2] if len(comp["trades"]) else np.array([])
     m.update(monte_carlo(r.values, tr, runs=mc_runs))
-    # regimes (withdraw-mode INR profit, compounding return)
     wm = pd.Series(wd["m_pnl"], index=mi.to_timestamp().tz_localize("UTC"))
     reg = {}
     for name, a, b in REGIMES:
         a, b = pd.Timestamp(a, tz="UTC"), pd.Timestamp(b, tz="UTC")
-        s = wm[(wm.index >= a) & (wm.index < b)]
+        s_ = wm[(wm.index >= a) & (wm.index < b)]
         e = comp["eq"][(comp["eq"].index >= a) & (comp["eq"].index < b)]
-        reg[name] = {"wd_sum_inr": float(s.sum()), "wd_median_inr": float(s.median()) if len(s) else np.nan,
+        reg[name] = {"wd_sum_inr": float(s_.sum()), "wd_median_inr": float(s_.median()) if len(s_) else np.nan,
                      "comp_ret": float(e.iloc[-1] / e.iloc[0] - 1) if len(e) > 1 and e.iloc[0] > 0 else np.nan}
     pos_tot = sum(max(v["wd_sum_inr"], 0) for v in reg.values())
     top = max(reg.items(), key=lambda kv: kv[1]["wd_sum_inr"])
     m["regime_flag"] = bool(pos_tot > 0 and top[1]["wd_sum_inr"] / pos_tot > 0.5)
     m["regime_top"] = top[0]
     m["regimes"] = reg
-    # stress 3x and delay +1 bar
-    st = venue.stressed(3.0)
-    wd3 = sim(df, tg, st, 1, sp, tpp, trail, band)
-    c3 = sim(df, tg, st, 0, sp, tpp, trail, band)
+    stv = venue.stressed(3.0)
+    wd3 = simfn(df, arr, stv, 1, False, 0, trail, band)
+    c3 = simfn(df, arr, stv, 0, False, 0, trail, band)
     m["stress3x_median_month_inr"] = float(np.nanmedian(wd3["m_pnl"]))
     m["stress3x_cagr"] = _cagr(c3["eq"])
-    wdl = sim(df_full, np.asarray(target), venue, 1, stop, tp, trail, band, delay=1)
-    k0 = len(df_full.month_id.unique()) - len(mi)
+    wdl = simfn(df_full, arrays, venue, 1, False, 1, trail, band)
+    k0 = len(np.unique(df_full.month_id.to_numpy())) - len(mi)
     m["delay1_median_month_inr"] = float(np.nanmedian(wdl["m_pnl"][k0:]))
-    cdl = sim(df_full, np.asarray(target), venue, 0, stop, tp, trail, band, delay=1)
-    m["delay1_cagr"] = _cagr(cdl["eq"].iloc[i0:])
+    cdl = simfn(df_full.iloc[i0 - 1:], slice_arr(arrays, i0 - 1, len(df_full)), venue, 0, False, 1, trail, band)
+    m["delay1_cagr"] = _cagr(cdl["eq"])
     return res
 
 

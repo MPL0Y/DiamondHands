@@ -262,12 +262,19 @@ def funding_level(df, lo=0.0, hi=0.0003, base="trend", fast=20, slow=100):
 
 
 # ---------------------------------------------------------------- calendar
-def calendar(df, hours=(), weekdays=(0, 1, 2, 3, 4, 5, 6), side="long"):
-    """Hold during selected UTC hours/weekdays. The target for bar t+1 is known at t's close."""
+def calendar(df, hours=(), weekdays=(0, 1, 2, 3, 4, 5, 6), side="long", tom=0, trend=0):
+    """Hold during selected UTC hours/weekdays. The target for bar t+1 is known at t's close.
+    tom>0: turn-of-month — only the last `tom` and first `tom` calendar days of each month.
+    trend>0: only when close > SMA(trend) (known at close)."""
     nxt = df.index + (df.index[1] - df.index[0])
     ok = np.isin(nxt.weekday, list(weekdays))
     if hours:
         ok &= np.isin(nxt.hour, list(hours))
+    if tom:
+        dim = nxt.days_in_month
+        ok &= (nxt.day <= tom) | (nxt.day > dim - tom)
+    if trend:
+        ok &= nz(df.close.to_numpy() > sma(df.close.to_numpy(), trend)).astype(bool)
     t = ok.astype(float)
     return {"target": t if side == "long" else -t}
 
@@ -287,3 +294,61 @@ REGISTRY = {
     "funding_contra": funding_contra, "funding_level": funding_level,
     "calendar": calendar, "weekend_flat": weekend_flat,
 }
+
+
+# ---------------------------------------------------------------- user-supplied: TradingView "Supertrend" (Pine v4)
+@njit(cache=True)
+def _supertrend(h, l, c, atr_, mult):
+    n = len(c)
+    trend = np.ones(n)
+    up = np.full(n, np.nan)
+    dn = np.full(n, np.nan)
+    for t in range(n):
+        src = (h[t] + l[t]) / 2.0
+        u = src - mult * atr_[t]
+        d = src + mult * atr_[t]
+        u1 = up[t - 1] if t > 0 and not np.isnan(up[t - 1]) else u
+        d1 = dn[t - 1] if t > 0 and not np.isnan(dn[t - 1]) else d
+        if t > 0 and c[t - 1] > u1:
+            u = max(u, u1)
+        if t > 0 and c[t - 1] < d1:
+            d = min(d, d1)
+        up[t] = u
+        dn[t] = d
+        tr_prev = trend[t - 1] if t > 0 else 1.0
+        tr = tr_prev
+        if tr_prev == -1.0 and c[t] > d1:
+            tr = 1.0
+        elif tr_prev == 1.0 and c[t] < u1:
+            tr = -1.0
+        trend[t] = tr
+    return trend, up, dn
+
+
+def pine_atr(df, n, rma=True):
+    """Pine atr(): RMA of true range (alpha=1/n, seeded with SMA of first n); changeATR=false -> SMA."""
+    pc = df.close.shift(1)
+    tr = np.maximum(df.high - df.low, np.maximum((df.high - pc).abs(), (df.low - pc).abs()))
+    tr.iloc[0] = df.high.iloc[0] - df.low.iloc[0]
+    if not rma:
+        return tr.rolling(int(n)).mean().to_numpy()
+    x = tr.to_numpy()
+    out = np.full(len(x), np.nan)
+    n = int(n)
+    if len(x) >= n:
+        out[n - 1] = x[:n].mean()
+        for i in range(n, len(x)):
+            out[i] = (out[i - 1] * (n - 1) + x[i]) / n
+    return out
+
+
+def supertrend(df, period=10, mult=3.0, change_atr=True, side="long"):
+    a = pine_atr(df, period, change_atr)
+    valid = ~np.isnan(a)
+    trend, up, dn = _supertrend(df.high.to_numpy(), df.low.to_numpy(), df.close.to_numpy(), np.nan_to_num(a), float(mult))
+    trend = np.where(valid, trend, 0.0)
+    t = np.where(trend > 0, 1.0, 0.0 if side == "long" else -1.0)
+    return {"target": t * valid}
+
+
+REGISTRY["supertrend"] = supertrend

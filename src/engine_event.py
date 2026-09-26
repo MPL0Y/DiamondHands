@@ -123,6 +123,7 @@ def run_event(bars, targets, venue, mode="compound", e0_inr=10_000.0, fx=None, f
     fund = (fund if fund is not None else pd.Series(0.0, idx)).reindex(idx).fillna(0.0)
     brk = Broker(venue)
     acct = Account(equity=e0_inr / fx.iloc[0], mark=bars.open.iloc[0])
+    em0 = acct.equity
     strat = TargetFollower(trail)
     eq_close, months, trades = [], {}, []
     trade_open = None
@@ -150,8 +151,9 @@ def run_event(bars, targets, venue, mode="compound", e0_inr=10_000.0, fx=None, f
         if i > 0 and t.month != idx[i - 1].month:
             key = idx[i - 1].strftime("%Y-%m")
             if mode == "withdraw":
-                months[key] = acct.equity * fx.iloc[i] - e0_inr if not acct.dead else -e0_inr
+                months[key] = ((acct.equity if not acct.dead else 0.0) - em0) * fx.iloc[i]
                 acct.equity = e0_inr / fx.iloc[i]
+                em0 = acct.equity
                 acct.dead = False
                 force = True
         if acct.dead:
@@ -260,7 +262,7 @@ def run_event(bars, targets, venue, mode="compound", e0_inr=10_000.0, fx=None, f
             continue
         eq_close.append(acct.equity)
     if mode == "withdraw":
-        months[idx[-1].strftime("%Y-%m")] = (eq_close[-1] * fx.iloc[-1] - e0_inr)
+        months[idx[-1].strftime("%Y-%m")] = (eq_close[-1] - em0) * fx.iloc[-1]
     if trade_open is not None:
         record_trade_close(len(idx) - 1, eq_close[-1])
     return {"equity": pd.Series(eq_close, idx), "months": pd.Series(months), "trades": trades,

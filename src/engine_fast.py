@@ -41,6 +41,7 @@ def simulate(o, h, l, c, fund, tgt, stop, tp, trail, month_id, fx, lot, mmr, fee
     tr = np.zeros((n // 1 + 1, 4))
     ntr = 0
     E = e0_inr / fx[0]
+    Em0 = E            # month-start equity (USD); P&L excludes FX drift on capital
     q = 0.0
     cur = 0.0          # current target
     last_exec = 0.0    # target at last rebalance
@@ -69,8 +70,9 @@ def simulate(o, h, l, c, fund, tgt, stop, tp, trail, month_id, fx, lot, mmr, fee
         if t > 0 and month_id[t] != month_id[t - 1]:
             k = month_id[t - 1] - m0
             if mode == 1:
-                m_pnl[k] = E * fx[t] - e0_inr
+                m_pnl[k] = (E - Em0) * fx[t]
                 E = e0_inr / fx[t]
+                Em0 = E
                 dead = False
                 force = True
         if dead:
@@ -231,7 +233,7 @@ def simulate(o, h, l, c, fund, tgt, stop, tp, trail, month_id, fx, lot, mmr, fee
     # final month
     if mode == 1:
         k = month_id[n - 1] - m0
-        m_pnl[k] = (eq[n - 1] if not dead else 0.0) * fx[n - 1] - e0_inr
+        m_pnl[k] = ((eq[n - 1] if not dead else 0.0) - Em0) * fx[n - 1]
     if q != 0.0 and ntr < tr.shape[0]:
         tr[ntr, 0] = tr_i0; tr[ntr, 1] = n - 1; tr[ntr, 2] = E / tr_e0 - 1.0; tr[ntr, 3] = np.sign(q)
         ntr += 1

@@ -15,9 +15,12 @@ import pandas as pd
 
 from src.config import EXP, ROOT, OOS_START, START_CAPITAL_INR, TARGET_MONTHLY_INR
 from src.data import bars
-from src.backtest import sim, walk_forward, evaluate, windows, month_index
+from src.backtest import sim, walk_forward, evaluate, windows, month_index, target_sim, slice_arr
+from src.custom import CUSTOM
 from src.metrics import daily_returns, deflated_sharpe, pbo_cscv
 from src.strategies import REGISTRY, rvol, bpy
+import src.ml  # registers ML strategies
+import src.options  # registers options custom sim
 from src.venues import VENUES
 
 LB = EXP / "leaderboard.csv"
@@ -89,28 +92,29 @@ def build_targets(df, cfg, params_list):
         tgt = base * L
         if cfg.get("overlay", {}).get("dd_delever"):
             tgt = dd_delever(df, tgt, venue, cfg["overlay"]["dd_delever"])
-        out.append({"params": p, "target": tgt, "stop": s.get("stop"), "tp": s.get("tp"),
-                    "trail": cfg.get("trail", 0.0)})
+        out.append({"params": p, "arrays": {"target": tgt, "stop": s.get("stop"), "tp": s.get("tp")}})
     return out
 
 
-def kelly_scale(df, stitched, cfg_targets, sel, venue, cfg):
+def kelly_scale(df, stitched, cfg_targets, sel, venue, cfg, simfn):
     """Half-Kelly leverage per OOS window from the selected config's TRAIN returns (capped)."""
     cap = cfg.get("kelly_cap", 5.0)
     idx = df.index
-    out = stitched.copy()
+    out = stitched["target"].copy()
     ws = windows(test_months=cfg.get("test_months", 6))
     for (a, b), (_, k) in zip(ws, sel):
         tr0 = max(idx[0], a - pd.DateOffset(years=cfg.get("train_years", 3)))
         i0, i1, i2 = idx.searchsorted(tr0), idx.searchsorted(a), idx.searchsorted(b)
         c = cfg_targets[k]
-        r = sim(df.iloc[i0:i1], c["target"][i0:i1], venue, 0, lotfree=True)
+        r = simfn(df.iloc[i0:i1], slice_arr(c["arrays"], i0, i1), venue, 0, True, 0, cfg.get("trail", 0.0), cfg.get("band", 0.0))
         d = daily_returns(r["eq"])
         mu, var = d.mean(), d.var()
         f = 0.5 * mu / var if var > 0 else 0.0
         f = float(np.clip(f, 0.0, cap))
-        out[i1:i2] = stitched[i1:i2] * f
-    return out
+        out[i1:i2] = stitched["target"][i1:i2] * f
+    stitched = dict(stitched)
+    stitched["target"] = out
+    return stitched
 
 
 def run(cfg, commit=True, verbose=True):
@@ -119,24 +123,26 @@ def run(cfg, commit=True, verbose=True):
     df = bars(cfg["tf"])
     venue = VENUES[cfg.get("venue", "delta_india_perp")]
     params_list = expand_grid(cfg.get("grid", {}), cfg.get("fixed", {}))
-    cts = build_targets(df, cfg, params_list)
-    stitched, st_stop, st_tp, sel = walk_forward(df, cts, venue, cfg.get("score", "median_month"),
-                                                 cfg.get("train_years", 3), cfg.get("test_months", 6),
-                                                 band=cfg.get("band", 0.0))
+    custom = CUSTOM.get(cfg["strategy"])
+    if custom:
+        cts = custom["build"](df, cfg, params_list)
+        simfn = custom["sim"]
+    else:
+        cts = build_targets(df, cfg, params_list)
+        simfn = target_sim
+    trail, band = cfg.get("trail", 0.0), cfg.get("band", 0.0)
+    stitched, sel = walk_forward(df, cts, venue, cfg.get("score", "median_month"), cfg.get("train_years", 3),
+                                 cfg.get("test_months", 6), simfn=simfn, trail=trail, band=band)
     if cfg.get("lev") == "kelly":
-        stitched = kelly_scale(df, stitched, cts, sel, venue, cfg)
-    has_stop = any(c["stop"] is not None for c in cts)
-    has_tp = any(c["tp"] is not None for c in cts)
-    res = evaluate(df, stitched, venue, st_stop if has_stop else None, st_tp if has_tp else None,
-                   cfg.get("trail", 0.0), cfg.get("band", 0.0))
+        stitched = kelly_scale(df, stitched, cts, sel, venue, cfg, simfn)
+    res = evaluate(df, stitched, venue, trail, band, simfn=simfn)
+    res["stitched"], res["sel"], res["cands"] = stitched, sel, cts
     m = res["metrics"]
-    # trial bookkeeping: full-dev-period daily Sharpe of every config (for DSR variance, PBO matrix)
+    # trial bookkeeping: OOS-period daily Sharpe of every config (for DSR variance, PBO matrix)
     i0 = df.index.searchsorted(OOS_START)
     R, srs = [], []
     for c in cts:
-        r = sim(df.iloc[i0:], c["target"][i0:], venue, 0,
-                None if c["stop"] is None else c["stop"][i0:], None if c["tp"] is None else c["tp"][i0:],
-                c["trail"], cfg.get("band", 0.0), lotfree=True)
+        r = simfn(df.iloc[i0:], slice_arr(c["arrays"], i0, len(df)), venue, 0, True, 0, trail, band)
         d = daily_returns(r["eq"]).to_numpy()
         R.append(d)
         srs.append(d.mean() / d.std() if d.std() > 0 else 0.0)
