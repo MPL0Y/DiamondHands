@@ -1,0 +1,23 @@
+{
+ "id": "E0572",
+ "family": "ensemble",
+ "strategy": "ensemble",
+ "tf": "1h",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "De-risking overlay: exposure scaled by min(1, target/realised vol). It cuts size in turbulent periods and never adds leverage in calm ones, which should lower max DD so a higher leverage multiplier fits under the 50% cap. ['E0550'] vt=0.9",
+ "grid": {
+  "weighting": [
+   "equal"
+  ]
+ },
+ "fixed": {
+  "components": [
+   "E0550"
+  ],
+  "lev": 1.0,
+  "step": 0.25,
+  "vol_target": 0.9,
+  "vt_cap": 1.0
+ }
+}
