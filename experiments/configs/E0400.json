@@ -1,0 +1,22 @@
+{
+ "id": "E0400",
+ "family": "ml",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "[rerun of E0188 after FX fix] ML: gradient-boosted trees on price/vol/funding/sentiment features. Purged, embargoed CV; retrained every 6 months; OOS by construction. A 52-53% hit rate on hourly-to-daily horizons might beat costs after thresholding. Meta-labeling should filter a trend primary's bad trades (Lopez de Prado 2018).",
+ "strategy": "ml_dir",
+ "tf": "1h",
+ "grid": {
+  "thr": [
+   0.52,
+   0.54,
+   0.56,
+   0.58,
+   0.6
+  ]
+ },
+ "fixed": {
+  "H": 6,
+  "side": "both"
+ }
+}
