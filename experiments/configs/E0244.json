@@ -1,0 +1,40 @@
+{
+ "id": "E0244",
+ "family": "trend",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "[rerun of E0032 after FX fix] Trend: BTC shows time-series momentum (Moskowitz et al. 2012; Liu & Tsyvinski 2021). Trend-following should cut bear-market drawdowns versus buy-and-hold.",
+ "strategy": "tsmom",
+ "tf": "1h",
+ "grid": {
+  "lookbacks": [
+   [
+    168,
+    720,
+    2160
+   ],
+   [
+    336,
+    1440,
+    4320
+   ],
+   [
+    720,
+    2160,
+    4320
+   ],
+   [
+    72,
+    168,
+    720
+   ]
+  ],
+  "thresh": [
+   0.0,
+   0.5
+  ]
+ },
+ "fixed": {
+  "side": "long"
+ }
+}
