@@ -1,0 +1,25 @@
+{
+ "id": "E0547",
+ "family": "ensemble",
+ "strategy": "ensemble",
+ "tf": "1h",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Blend: the combo long/short system (E0528, 4h) and the earlier best ensemble (E0449, 1h) use different signals. Averaging them should smooth equity, so more leverage fits under the 50% DD limit and profit rises.",
+ "grid": {
+  "weighting": [
+   "equal",
+   "invvol"
+  ]
+ },
+ "fixed": {
+  "components": [
+   "E0528",
+   "E0301",
+   "E0292",
+   "E0420"
+  ],
+  "lev": 1.0,
+  "step": 0.25
+ }
+}
