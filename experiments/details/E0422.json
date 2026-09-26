@@ -1,0 +1,79 @@
+{
+ "oos_cagr": 0.016297433619429702,
+ "sharpe": 0.18698017919280224,
+ "sortino": 0.13548853764318403,
+ "max_dd": 0.4470270648843453,
+ "calmar": 0.03645737562589453,
+ "median_month_inr": 0.0,
+ "mean_month_inr": 60.36897384199193,
+ "pct_months_1L": 0.0,
+ "worst_month_inr": -1410.087214502349,
+ "median_month_ret_lotfree": 0.0,
+ "req_capital_inr": Infinity,
+ "compound_first_1L_month": null,
+ "compound_consistency_after": 0.0,
+ "final_equity_inr": 15747.110472895647,
+ "n_trades": 82,
+ "win_rate": 0.4634146341463415,
+ "n_days": 2825,
+ "skew": 0.13379520901114636,
+ "kurt": 26.335060510222267,
+ "exposure": 0.25628318584070797,
+ "liquidations_compound": 0,
+ "liquidations_withdraw": 0,
+ "fees_usd": 21.471097091981346,
+ "funding_usd": 39.761768505323566,
+ "mc_p_ruin": 0.0,
+ "mc_p_dd50": 0.003,
+ "mc_p5_terminal": 0.7169643814010623,
+ "mc_median_terminal": 1.0131435043327204,
+ "mc_p95_dd": 0.3682645767575547,
+ "tr_p_dd50": 0.114,
+ "tr_p95_dd": 0.5402248646403063,
+ "regime_flag": true,
+ "regime_top": "2023-24",
+ "regimes": {
+  "2018": {
+   "wd_sum_inr": 0.0,
+   "wd_median_inr": 0.0,
+   "comp_ret": 0.0
+  },
+  "2019": {
+   "wd_sum_inr": 0.0,
+   "wd_median_inr": 0.0,
+   "comp_ret": 0.0
+  },
+  "2020": {
+   "wd_sum_inr": 0.0,
+   "wd_median_inr": 0.0,
+   "comp_ret": 0.0
+  },
+  "2021": {
+   "wd_sum_inr": 789.0782370509373,
+   "wd_median_inr": 0.0,
+   "comp_ret": -0.060013495450360055
+  },
+  "2022": {
+   "wd_sum_inr": -1046.7504066914155,
+   "wd_median_inr": 0.0,
+   "comp_ret": -0.1396320202742729
+  },
+  "2023-24": {
+   "wd_sum_inr": 4647.876137964935,
+   "wd_median_inr": 156.28208129013206,
+   "comp_ret": 0.31314716723117475
+  },
+  "2025+": {
+   "wd_sum_inr": 1224.1105989807927,
+   "wd_median_inr": 0.0,
+   "comp_ret": 0.06064523640410924
+  }
+ },
+ "stress3x_median_month_inr": 0.0,
+ "stress3x_cagr": 0.002080692017703223,
+ "delay1_median_month_inr": 0.0,
+ "delay1_cagr": 0.05973939592201538,
+ "dsr": 2.9650281457281436e-27,
+ "sr0_daily": 0.2120072798825491,
+ "pbo": 0.4425
+}
