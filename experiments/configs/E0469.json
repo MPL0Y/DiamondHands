@@ -1,0 +1,21 @@
+{
+ "id": "E0469",
+ "family": "calendar",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Turn-of-month (TOM) follow-up: E0425 leads within limits. Test TOM at 4h resolution, fractional/extra leverage, and combined with a funding-level filter.",
+ "strategy": "calendar",
+ "tf": "4h",
+ "grid": {
+  "tom": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ]
+ },
+ "fixed": {
+  "side": "long"
+ }
+}
