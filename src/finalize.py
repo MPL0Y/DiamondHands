@@ -67,10 +67,12 @@ def frontier_chart(frs):
     for cid, f in frs.items():
         ax[0].plot(f.p_ruin * 100, f.median_month_inr, marker="o", ms=3, label=cid)
         for _, r in f.iterrows():
-            if r.lev in (1, 3, 10, 20):
+            if r.lev in (0.5, 1, 1.5, 2, 3, 5):
                 ax[0].annotate(f"{r.lev:g}x", (r.p_ruin * 100, r.median_month_inr), fontsize=6)
         ax[1].plot(f.lev, f.max_dd * 100, marker="o", ms=3, label=cid)
+    ax[0].set_ylim(-600, 1200)
     ax[0].axvline(5, color=C3, ls="--", lw=0.8); ax[0].set_xlabel("P(ruin) within 12 months, %"); ax[0].set_ylabel("median monthly ₹ (withdraw, ₹10k)")
+    ax[0].set_title("points below -600 (liquidation months) clipped", fontsize=8)
     ax[1].axhline(50, color=C3, ls="--", lw=0.8); ax[1].set_xscale("log"); ax[1].set_xlabel("leverage"); ax[1].set_ylabel("OOS max DD %")
     for a in ax:
         a.grid(alpha=0.25); a.spines[["top", "right"]].set_visible(False)

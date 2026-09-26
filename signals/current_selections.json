@@ -1,0 +1,67 @@
+{
+ "E0301": {
+  "strategy": "funding_level",
+  "tf": "1h",
+  "lev": 1.0,
+  "overlay": null,
+  "window": "2026-07-01",
+  "params": {
+   "base": "none",
+   "hi": 0.001,
+   "lo": -1
+  }
+ },
+ "E0292": {
+  "strategy": "vol_regime",
+  "tf": "4h",
+  "lev": 1.0,
+  "overlay": null,
+  "window": "2026-07-01",
+  "params": {
+   "mode": "trend_highvol",
+   "vol_n": 20,
+   "q_window": 2190,
+   "fast": 60,
+   "slow": 300,
+   "vol_q": 0.5
+  }
+ },
+ "E0420": {
+  "strategy": "ml_meta",
+  "tf": "4h",
+  "lev": 1.0,
+  "overlay": null,
+  "window": "2026-07-01",
+  "params": {
+   "H": 18,
+   "primary": "ma",
+   "fast": 60,
+   "slow": 300,
+   "thr": 0.45
+  }
+ },
+ "E0425": {
+  "strategy": "calendar",
+  "tf": "1d",
+  "lev": 1.0,
+  "overlay": null,
+  "window": "2026-07-01",
+  "params": {
+   "side": "long",
+   "tom": 4
+  }
+ },
+ "E0395": {
+  "strategy": "funding_level",
+  "tf": "1h",
+  "lev": 0.85,
+  "overlay": null,
+  "window": "2026-07-01",
+  "params": {
+   "base": "none",
+   "hi": 5e-05,
+   "lo": -1
+  }
+ },
+ "E0449_weighting": "invvol"
+}

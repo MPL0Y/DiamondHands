@@ -1,1 +1,15 @@
 Sat Sep 26 02:10:49 UTC 2026 BitMEX funding pager overshot the cutoff by the rows above. They were deleted from the raw file without inspection (only the row count was read). No lockbox price data was loaded.
+2026-09-26 03:55:20.139759+00:00 DOWNLOAD lockbox raw data
+2026-09-26 03:55:29.684024+00:00 BUILD lockbox processed data
+2026-09-26 03:56:31.961072+00:00 BUILD lockbox processed data
+Sat Sep 26 03:56:58 UTC 2026 NOTE: after tag lockbox-freeze only src/build_lockbox.py changed (BitMEX URL encoding). Strategy code and parameters are untouched.
+2026-09-26 03:56:59.627775+00:00 EVALUATE lockbox finalists=['E0449', 'E0425', 'E0395']
+2026-09-26 03:57:00.056995+00:00 LOAD lockbox bars tf=1h
+2026-09-26 03:57:01.861399+00:00 LOAD lockbox bars tf=4h
+2026-09-26 03:57:20.779217+00:00 LOAD lockbox bars tf=1d
+2026-09-26 03:57:27.143194+00:00 EVALUATE done; results written verbatim to reports/lockbox_results.json
+2026-09-26 03:58:03.662505+00:00 READ current-window parameter selections of frozen procedure for signal generator (no evaluation)
+2026-09-26 03:58:04.916724+00:00 LOAD lockbox bars tf=1h
+2026-09-26 03:58:06.714930+00:00 LOAD lockbox bars tf=4h
+2026-09-26 03:58:08.440644+00:00 LOAD lockbox bars tf=1d
+2026-09-26 04:00:35.552885+00:00 READ lockbox BTC first/last close for context in report

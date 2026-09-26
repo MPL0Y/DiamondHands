@@ -43,7 +43,7 @@ def main():
     bm = []
     start = LOCKBOX_START
     while True:
-        js = json.loads(get(f"https://www.bitmex.com/api/v1/funding?symbol=XBTUSD&count=500&startTime={start.isoformat()}&reverse=false"))
+        js = json.loads(get(f"https://www.bitmex.com/api/v1/funding?symbol=XBTUSD&count=500&startTime={start.strftime('%Y-%m-%dT%H:%M:%S.000Z')}&reverse=false"))
         if not js:
             break
         bm += js
