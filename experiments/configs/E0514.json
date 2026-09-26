@@ -1,0 +1,10 @@
+{
+ "id": "E0514",
+ "family": "benchmark",
+ "strategy": "hold",
+ "tf": "1d",
+ "hypothesis": "Benchmark top-up: passive BTC exposure at 0.5-5x, spot vs perp, never/banded rebalancing. Defines what 'no skill' earns at each risk level.",
+ "venue": "delta_india_perp",
+ "lev": 0.5,
+ "band": 0.1
+}
