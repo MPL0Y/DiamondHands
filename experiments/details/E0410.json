@@ -1,0 +1,79 @@
+{
+ "oos_cagr": -1.0,
+ "sharpe": -0.6821378184597569,
+ "sortino": -0.19057948542487313,
+ "max_dd": 1.0,
+ "calmar": -1.0,
+ "median_month_inr": 0.0,
+ "mean_month_inr": 30.474359419226847,
+ "pct_months_1L": 0.0,
+ "worst_month_inr": -5870.976507784751,
+ "median_month_ret_lotfree": 0.0,
+ "req_capital_inr": Infinity,
+ "compound_first_1L_month": null,
+ "compound_consistency_after": 0.0,
+ "final_equity_inr": 0.0,
+ "n_trades": 55,
+ "win_rate": 0.45454545454545453,
+ "n_days": 2825,
+ "skew": -29.481688689317227,
+ "kurt": 1255.2172479553342,
+ "exposure": 0.10525073746312684,
+ "liquidations_compound": 1,
+ "liquidations_withdraw": 0,
+ "fees_usd": 17.6106761134134,
+ "funding_usd": -7.83012077417999,
+ "mc_p_ruin": 0.1192,
+ "mc_p_dd50": 0.1674,
+ "mc_p5_terminal": 0.0,
+ "mc_median_terminal": 0.8934166837298148,
+ "mc_p95_dd": 1.0,
+ "tr_p_dd50": 1.0,
+ "tr_p95_dd": 1.0,
+ "regime_flag": true,
+ "regime_top": "2020",
+ "regimes": {
+  "2018": {
+   "wd_sum_inr": 178.4543688757027,
+   "wd_median_inr": 0.0,
+   "comp_ret": 0.01401074674897873
+  },
+  "2019": {
+   "wd_sum_inr": -16525.16756957275,
+   "wd_median_inr": -801.7939467281625,
+   "comp_ret": -1.0
+  },
+  "2020": {
+   "wd_sum_inr": 11380.076936167847,
+   "wd_median_inr": 587.5228011662417,
+   "comp_ret": NaN
+  },
+  "2021": {
+   "wd_sum_inr": 2749.310656390841,
+   "wd_median_inr": -240.4375257493774,
+   "comp_ret": NaN
+  },
+  "2022": {
+   "wd_sum_inr": -1082.096273425123,
+   "wd_median_inr": 24.292888592657317,
+   "comp_ret": NaN
+  },
+  "2023-24": {
+   "wd_sum_inr": 4481.440570763534,
+   "wd_median_inr": -31.307341861376514,
+   "comp_ret": NaN
+  },
+  "2025+": {
+   "wd_sum_inr": 1652.096736788044,
+   "wd_median_inr": 119.46638755680158,
+   "comp_ret": NaN
+  }
+ },
+ "stress3x_median_month_inr": -362.6603374111341,
+ "stress3x_cagr": -1.0,
+ "delay1_median_month_inr": 0.0,
+ "delay1_cagr": -1.0,
+ "dsr": 1.602415445549746e-111,
+ "sr0_daily": 0.21270941372860863,
+ "pbo": 0.45775
+}
