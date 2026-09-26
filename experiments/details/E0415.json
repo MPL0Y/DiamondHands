@@ -1,0 +1,79 @@
+{
+ "oos_cagr": -0.13392934690839953,
+ "sharpe": -0.3802818127165973,
+ "sortino": -0.25895400149674763,
+ "max_dd": 0.7566278692749425,
+ "calmar": -0.1770082128176704,
+ "median_month_inr": 0.0,
+ "mean_month_inr": -24.678228882898164,
+ "pct_months_1L": 0.0,
+ "worst_month_inr": -3772.770843678519,
+ "median_month_ret_lotfree": 0.0,
+ "req_capital_inr": Infinity,
+ "compound_first_1L_month": null,
+ "compound_consistency_after": 0.0,
+ "final_equity_inr": 4569.9286196973835,
+ "n_trades": 61,
+ "win_rate": 0.4918032786885246,
+ "n_days": 2825,
+ "skew": -0.0064423465971143465,
+ "kurt": 30.422551462674058,
+ "exposure": 0.2311504424778761,
+ "liquidations_compound": 0,
+ "liquidations_withdraw": 0,
+ "fees_usd": 8.904328934079999,
+ "funding_usd": 16.896636034118906,
+ "mc_p_ruin": 0.0,
+ "mc_p_dd50": 0.0562,
+ "mc_p5_terminal": 0.55701022540873,
+ "mc_median_terminal": 0.8858026167836934,
+ "mc_p95_dd": 0.5086718974867035,
+ "tr_p_dd50": 1.0,
+ "tr_p95_dd": 0.8137552160556488,
+ "regime_flag": true,
+ "regime_top": "2023-24",
+ "regimes": {
+  "2018": {
+   "wd_sum_inr": 0.0,
+   "wd_median_inr": 0.0,
+   "comp_ret": 0.0
+  },
+  "2019": {
+   "wd_sum_inr": -4067.237915509465,
+   "wd_median_inr": 0.0,
+   "comp_ret": -0.3578851914099189
+  },
+  "2020": {
+   "wd_sum_inr": 103.9913977159175,
+   "wd_median_inr": 0.0,
+   "comp_ret": 0.010572782041074369
+  },
+  "2021": {
+   "wd_sum_inr": 854.0674925392075,
+   "wd_median_inr": 0.0,
+   "comp_ret": -0.01043405629072447
+  },
+  "2022": {
+   "wd_sum_inr": -6234.980391858477,
+   "wd_median_inr": -99.15445468413071,
+   "comp_ret": -0.5640714132618416
+  },
+  "2023-24": {
+   "wd_sum_inr": 5075.038200093064,
+   "wd_median_inr": 0.0,
+   "comp_ret": 0.14049755120685758
+  },
+  "2025+": {
+   "wd_sum_inr": 1974.045930910224,
+   "wd_median_inr": 308.1155188130006,
+   "comp_ret": 0.0
+  }
+ },
+ "stress3x_median_month_inr": 0.0,
+ "stress3x_cagr": -0.14290823129593466,
+ "delay1_median_month_inr": 0.0,
+ "delay1_cagr": -0.12688143917131978,
+ "dsr": 3.303890663014061e-35,
+ "sr0_daily": 0.21235172621464257,
+ "pbo": 0.2955
+}
