@@ -1,0 +1,79 @@
+{
+ "oos_cagr": -0.021299469419100214,
+ "sharpe": 0.2535567960850697,
+ "sortino": 0.34886168269322226,
+ "max_dd": 0.8561424822383015,
+ "calmar": -0.024878416689958917,
+ "median_month_inr": -143.04470525383294,
+ "mean_month_inr": 128.57991121547974,
+ "pct_months_1L": 0.0,
+ "worst_month_inr": -3809.833262130155,
+ "median_month_ret_lotfree": -0.01931541965921424,
+ "req_capital_inr": Infinity,
+ "compound_first_1L_month": null,
+ "compound_consistency_after": 0.0,
+ "final_equity_inr": 11764.690489936345,
+ "n_trades": 67,
+ "win_rate": 0.34328358208955223,
+ "n_days": 2825,
+ "skew": 0.19164827524208913,
+ "kurt": 13.904281802496541,
+ "exposure": 0.9996460176991151,
+ "liquidations_compound": 0,
+ "liquidations_withdraw": 0,
+ "fees_usd": 31.501665174533045,
+ "funding_usd": 175.63457269965258,
+ "mc_p_ruin": 0.0002,
+ "mc_p_dd50": 0.4278,
+ "mc_p5_terminal": 0.3532969670767236,
+ "mc_median_terminal": 0.9896526495655127,
+ "mc_p95_dd": 0.7463159584197796,
+ "tr_p_dd50": 1.0,
+ "tr_p95_dd": 0.9367232681398883,
+ "regime_flag": true,
+ "regime_top": "2020",
+ "regimes": {
+  "2018": {
+   "wd_sum_inr": -70.84612026352079,
+   "wd_median_inr": -505.6258303457107,
+   "comp_ret": -0.0021133437519054166
+  },
+  "2019": {
+   "wd_sum_inr": 6222.610362940122,
+   "wd_median_inr": 228.47673006742934,
+   "comp_ret": 0.33864652421280406
+  },
+  "2020": {
+   "wd_sum_inr": 11824.237774455025,
+   "wd_median_inr": 850.8911774208264,
+   "comp_ret": 1.9037470584584497
+  },
+  "2021": {
+   "wd_sum_inr": -3329.720627689594,
+   "wd_median_inr": -196.97230019711697,
+   "comp_ret": -0.45542460669469387
+  },
+  "2022": {
+   "wd_sum_inr": -1044.7738400325215,
+   "wd_median_inr": -297.32071369125515,
+   "comp_ret": -0.3572532593678869
+  },
+  "2023-24": {
+   "wd_sum_inr": 2522.7254603321144,
+   "wd_median_inr": -124.11504818806588,
+   "comp_ret": 0.009075516444935428
+  },
+  "2025+": {
+   "wd_sum_inr": -4166.301266702006,
+   "wd_median_inr": -247.1695492505587,
+   "comp_ret": -0.38360800443273424
+  }
+ },
+ "stress3x_median_month_inr": -186.4963574745634,
+ "stress3x_cagr": -0.027651509191709334,
+ "delay1_median_month_inr": -138.65644050141236,
+ "delay1_cagr": -0.08400449434882451,
+ "dsr": 9.947430733419912e-29,
+ "sr0_daily": 0.22116839536048363,
+ "pbo": NaN
+}
