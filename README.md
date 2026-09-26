@@ -26,7 +26,7 @@ python -m src.family_pbo ensemble; python -m src.family_pbo calendar
 
 # 3. finalists: plateau, engine agreement (bar + 1-minute replay), leverage frontier, charts
 python -m src.finalize --frontier E0449 E0425 E0510 E0395 E0453 --finalists E0449 E0425 E0510
-git checkout lockbox-freeze     # the frozen code
+git checkout cf7937a              # the frozen code (local tag lockbox-freeze; tag push is blocked by this environment)
 python -m src.download --lockbox && python -m src.build_lockbox && python -m src.lockbox   # Section 8, runs ONCE
 
 # 4. live signal for E0449 (signals only: never places orders, needs no API keys). Current-window params: signals/current_selections.json

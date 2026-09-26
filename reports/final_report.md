@@ -29,7 +29,7 @@ lagged; chosen per window). Round to 0.25 and multiply by 2, so **target leverag
 target changes. Size is rounded down to whole 0.001 BTC contracts, so at ₹10,000 the position is 0–2 contracts.
 No stop-loss or take-profit: the exit is the target going to 0. Cross margin: liquidation loses everything.
 
-**Selection procedure (frozen at git tag `lockbox-freeze`).** Every 6 months (1 Jan / 1 Jul) each component re-picks its
+**Selection procedure (frozen at commit `cf7937a`, tag `lockbox-freeze`).** Every 6 months (1 Jan / 1 Jul) each component re-picks its
 parameters by the best training-window median monthly return on the previous 3 years. It is penalised if the training
 max DD > 50%. The ensemble re-picks its weighting the same way. Selections used OOS are listed in `reports/finalists/E0449.json`.
 Parameters for the current window (2026-07 → 2026-12): C1 `hi`=0.1%, C2 fast 60 / slow 300 / vol_q 0.5
@@ -145,7 +145,7 @@ Leverage cannot close a 700× gap.
 
 ## 3. Lockbox (Section 8): run once, reported verbatim
 
-Frozen at git tag `lockbox-freeze`; lockbox data downloaded only afterwards; access log in `reports/lockbox_access.log`.
+Frozen at commit `cf7937a` (local tag `lockbox-freeze`); lockbox data downloaded only afterwards; access log in `reports/lockbox_access.log`.
 The walk-forward continued unchanged: each 6-month window and each ML refit used only data before it. Period:
 2025-09-26 → 2026-09-25 (perp data to 2026-09-24 23:59; Binance had not yet published the last day).
 BTC over the same period: $108,994 → $84,100 (**−22.8%**), low $57,800.
