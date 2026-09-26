@@ -1,0 +1,19 @@
+{
+ "id": "E0591",
+ "family": "combo",
+ "strategy": "combo_wf",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Execution variant: walk-forward selection costed at taker+slippage (conservative), trades executed as maker limits (fill only if price trades >=1bp through; otherwise market at the next open). [E0528 x1.5]",
+ "tf": "4h",
+ "fixed": {
+  "long_metric": "return",
+  "long_k": 5,
+  "long_ty": 4,
+  "short_metric": "sortino",
+  "short_k": 1,
+  "short_ty": 4,
+  "lev": 1.5
+ },
+ "exec": "limit_eval"
+}
