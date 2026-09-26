@@ -1,0 +1,10 @@
+{
+ "id": "E0002",
+ "family": "benchmark",
+ "strategy": "hold",
+ "tf": "1d",
+ "lev": 1,
+ "venue": "delta_india_perp",
+ "band": 0,
+ "hypothesis": "Benchmark: passive exposure sets the bar every active strategy must beat. venue=delta_india_perp lev=1 rebalance band=0"
+}
