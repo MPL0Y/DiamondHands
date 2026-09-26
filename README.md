@@ -41,8 +41,9 @@ Delta Exchange India's BTC perp at up to 2×): walk-forward OOS 2018–2025 medi
 The ₹1L-on-₹10k target is ~700× beyond anything that respects the risk limits (`reports/ceiling.md`).
 
 Notes:
-- `data.binance.vision` (bulk history) is reachable from India. `fapi.binance.com` / Bybit may be geo-blocked,
-  so the live generator uses Delta Exchange India's public API plus OKX public funding.
+- `fapi.binance.com` and Bybit may be geo-blocked, so the live generator uses only public, keyless endpoints:
+  Binance's market-data mirror `data-api.binance.vision` (klines), `data.binance.vision` monthly funding files plus OKX public
+  funding for the current month, alternative.me Fear & Greed, and Delta Exchange India's ticker for the mark price.
 - Experiments E0001–E0212 were superseded after a bug fix: the withdraw-mode P&L had been counting
   USDINR drift on idle capital. They were re-run as E0213–E0424. Both sets stay in the leaderboard, and N counts both.
 
