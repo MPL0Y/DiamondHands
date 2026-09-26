@@ -1,0 +1,27 @@
+{
+ "id": "E0151",
+ "venue": "delta_india_perp",
+ "hypothesis": "Sizing overlay: vol-targeting / DD-delevering / half-Kelly should cut the drawdowns of the best raw signals below 50%, so leverage can raise the median month within the risk limits.",
+ "family": "funding",
+ "strategy": "funding_level",
+ "tf": "1d",
+ "grid": {
+  "hi": [
+   5e-05,
+   0.0001,
+   0.0002,
+   0.0004,
+   0.001
+  ],
+  "lo": [
+   -1,
+   0.0
+  ]
+ },
+ "fixed": {
+  "base": "none"
+ },
+ "lev": "kelly",
+ "kelly_cap": 4.0,
+ "overlay": {}
+}
