@@ -1,0 +1,10 @@
+{
+ "id": "E0213",
+ "family": "benchmark",
+ "strategy": "hold",
+ "tf": "1d",
+ "lev": 1,
+ "venue": "coindcx_spot",
+ "band": 0,
+ "hypothesis": "[rerun of E0001 after FX fix] Benchmark: passive exposure sets the bar every active strategy must beat. venue=coindcx_spot lev=1 rebalance band=0"
+}
