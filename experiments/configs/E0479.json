@@ -1,0 +1,23 @@
+{
+ "id": "E0479",
+ "family": "ensemble",
+ "strategy": "ensemble",
+ "tf": "1h",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Ensemble round 2: E0449 (FL1h+VR4h+MLM4h at 2x) leads. Probe leverage around it, add the turn-of-month component (E0425) and the 1d funding-level signal, and test robustness to dropping a component.",
+ "grid": {
+  "weighting": [
+   "equal",
+   "invvol"
+  ]
+ },
+ "fixed": {
+  "components": [
+   "E0301",
+   "E0420"
+  ],
+  "lev": 2.5,
+  "step": 0.25
+ }
+}
