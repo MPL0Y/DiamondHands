@@ -1,0 +1,1 @@
+Sat Sep 26 02:10:49 UTC 2026 BitMEX funding pager overshot the cutoff by the rows above. They were deleted from the raw file without inspection (only the row count was read). No lockbox price data was loaded.
