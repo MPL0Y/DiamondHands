@@ -1,0 +1,79 @@
+{
+ "oos_cagr": -0.03914180458406147,
+ "sharpe": -0.003005287899315525,
+ "sortino": -0.0024180068284324133,
+ "max_dd": 0.6820960651870491,
+ "calmar": -0.057384592261689314,
+ "median_month_inr": 1.7583590021349664,
+ "mean_month_inr": 25.120485467601895,
+ "pct_months_1L": 0.0,
+ "worst_month_inr": -1881.6776004827998,
+ "median_month_ret_lotfree": -0.0029506437768241087,
+ "req_capital_inr": Infinity,
+ "compound_first_1L_month": null,
+ "compound_consistency_after": 0.0,
+ "final_equity_inr": 10204.185889936267,
+ "n_trades": 212,
+ "win_rate": 0.47641509433962265,
+ "n_days": 2825,
+ "skew": 0.09412803549552387,
+ "kurt": 23.154755423519017,
+ "exposure": 0.30035398230088495,
+ "liquidations_compound": 0,
+ "liquidations_withdraw": 0,
+ "fees_usd": 42.156922844480306,
+ "funding_usd": 40.98332703647036,
+ "mc_p_ruin": 0.0,
+ "mc_p_dd50": 0.0368,
+ "mc_p5_terminal": 0.6015953720195217,
+ "mc_median_terminal": 0.9699413353364195,
+ "mc_p95_dd": 0.48162566216165076,
+ "tr_p_dd50": 0.8716,
+ "tr_p95_dd": 0.7327525497321533,
+ "regime_flag": false,
+ "regime_top": "2020",
+ "regimes": {
+  "2018": {
+   "wd_sum_inr": -6495.727619699465,
+   "wd_median_inr": -477.71944897699814,
+   "comp_ret": -0.5557848611100962
+  },
+  "2019": {
+   "wd_sum_inr": 3556.0162008759726,
+   "wd_median_inr": -14.354790412013244,
+   "comp_ret": 0.3066899838140422
+  },
+  "2020": {
+   "wd_sum_inr": 5425.054415888904,
+   "wd_median_inr": 377.2460708995777,
+   "comp_ret": 0.5840295808856264
+  },
+  "2021": {
+   "wd_sum_inr": -2966.945934434445,
+   "wd_median_inr": -108.45402732680577,
+   "comp_ret": -0.2706067250353875
+  },
+  "2022": {
+   "wd_sum_inr": -296.09072310079137,
+   "wd_median_inr": 104.22043226257028,
+   "comp_ret": -0.15260695408493175
+  },
+  "2023-24": {
+   "wd_sum_inr": 2548.5003523758496,
+   "wd_median_inr": -47.88472508612722,
+   "comp_ret": 0.2560960190153412
+  },
+  "2025+": {
+   "wd_sum_inr": 565.3984565809515,
+   "wd_median_inr": 58.97028804717593,
+   "comp_ret": 0.02868141032917504
+  }
+ },
+ "stress3x_median_month_inr": -47.58572428271509,
+ "stress3x_cagr": -0.10593509894974029,
+ "delay1_median_month_inr": -5.745475438092399,
+ "delay1_cagr": -0.039919931645907125,
+ "dsr": 2.8250720922447075e-35,
+ "sr0_daily": 0.23201889524184255,
+ "pbo": 0.243
+}
