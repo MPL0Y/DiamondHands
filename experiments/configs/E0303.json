@@ -1,0 +1,30 @@
+{
+ "id": "E0303",
+ "family": "funding",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "[rerun of E0091 after FX fix] Funding: extreme perp funding marks crowded positioning, which then reverses; paying high carry erodes long returns (Schmeling et al. 2023 crypto carry).",
+ "strategy": "funding_contra",
+ "tf": "4h",
+ "grid": {
+  "window": [
+   7,
+   21,
+   60
+  ],
+  "z_in": [
+   1.5,
+   2.0,
+   2.5,
+   3.0
+  ],
+  "hold": [
+   6,
+   18,
+   42
+  ]
+ },
+ "fixed": {
+  "side": "short"
+ }
+}
