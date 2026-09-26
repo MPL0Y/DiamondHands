@@ -74,6 +74,20 @@ class Broker:
         acct.fills.append(f)
         return f
 
+    def limit_fill(self, acct, t, target_qty, limit_px, ref_price):
+        """Resting limit order filled at its limit price (maker fee, no slippage). Account is marked at ref_price."""
+        dq = target_qty - acct.qty
+        if dq == 0:
+            return None
+        fee = abs(dq) * limit_px * self.v.maker
+        acct.revalue(ref_price)
+        acct.equity -= dq * (limit_px - ref_price) + fee
+        acct.qty = target_qty
+        acct.fees += fee
+        f = Fill(t, dq, limit_px, fee, "limit")
+        acct.fills.append(f)
+        return f
+
     def close_at(self, acct, t, price, kind, maker=False):
         q = acct.qty
         side = 1 if q > 0 else -1
@@ -111,7 +125,7 @@ class TargetFollower:
 
 
 def run_event(bars, targets, venue, mode="compound", e0_inr=10_000.0, fx=None, fund=None,
-              stops=None, tps=None, trail=0.0, band=0.0, sub_bars=None):
+              stops=None, tps=None, trail=0.0, band=0.0, sub_bars=None, exec_limit=0):
     """bars: DataFrame(open,high,low,close) at strategy TF. targets: Series aligned to bars (decided at close).
     fund: Series of funding sums per bar. fx: USDINR per bar. sub_bars: optional 1m DataFrame for intrabar replay.
     Returns dict with equity Series (at TF closes), monthly INR P&L (withdraw), trades list."""
@@ -128,6 +142,7 @@ def run_event(bars, targets, venue, mode="compound", e0_inr=10_000.0, fx=None, f
     eq_close, months, trades = [], {}, []
     trade_open = None
     month_start_eq = None
+    pending_market = False
 
     step = idx[1] - idx[0]
     if sub_bars is not None:
@@ -180,19 +195,31 @@ def run_event(bars, targets, venue, mode="compound", e0_inr=10_000.0, fx=None, f
         if rebalance and acct.equity > 0:
             want = brk.round_lots(strat.target * acct.equity / O[i])
             prev_q = acct.qty
-            if want != prev_q:
+            as_limit = exec_limit == 1 and i > 0 and not pending_market and not force
+            skip = False
+            if want != prev_q and as_limit:
+                lp = C[i - 1]
+                through = (L[i] < lp * (1 - 1e-4)) if want > prev_q else (H[i] > lp * (1 + 1e-4))
+                if not through:
+                    pending_market = True       # missed: market order at the next bar's open
+                    skip = True
+            fill = (lambda q_: brk.limit_fill(acct, t, q_, C[i - 1], O[i])) if (as_limit and not skip) else \
+                   (lambda q_: brk.market(acct, t, q_, O[i]))
+            if want != prev_q and not skip:
+                pending_market = False
                 opening = want != 0 and (prev_q == 0 or np.sign(want) != np.sign(prev_q))
                 if prev_q != 0 and (want == 0 or np.sign(want) != np.sign(prev_q)):
-                    brk.market(acct, t, 0.0, O[i])          # close leg
+                    fill(0.0)                               # close leg
                     record_trade_close(i, acct.equity)
                 e_entry = acct.equity
                 if want != acct.qty:
-                    brk.market(acct, t, want, O[i])
+                    fill(want)
                 if opening:
                     trade_open = (i, e_entry, np.sign(want))
                     strat.arm(O[i], np.sign(want), stops.iloc[i - 1] if i > 0 else 0.0,
                               tps.iloc[i - 1] if i > 0 else 0.0)
-            strat.executed = strat.target
+            if not skip:
+                strat.executed = strat.target
         # ---------- funding
         if acct.qty != 0 and fund.iloc[i] != 0:
             c = acct.qty * O[i] * fund.iloc[i]

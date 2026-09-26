@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-"""Live signal generator for the ranked finalist E0449. SIGNALS ONLY: never places orders, never asks for API keys.
+"""Live signal generator. SIGNALS ONLY: never places orders, never asks for API keys.
+
+Default --strategy E0607 (best combination, reports/combo_report.md): inverse-vol blend of the combo long/short system
+(5 long + 1 short indicator combinations on 4h, current walk-forward picks in reports/combo_picks.json) and E0449
+below, x1.75. Execution: LIMIT at the last 1h close, market at the next open if not filled.
+--strategy E0449: the earlier finalist alone (market orders).
 
 E0449 = ensemble (inverse-vol weighted, quantised to 0.25, x2 leverage) of three causal sub-signals on BTC:
   C1 funding_level 1h : long while the last known 8h funding rate < `hi` (current window: 0.001)
@@ -123,87 +128,139 @@ def to_1h(series4, idx1):
     return s.reindex(idx1, method="ffill").fillna(0.0).to_numpy()
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--capital", type=float, default=10_000.0, help="account equity in ₹ (Delta India wallet)")
-    ap.add_argument("--paper", action="store_true", help="append signal + hypothetical fill to signals/paper_log.csv")
-    a = ap.parse_args()
-
-    fund = funding_history()
-    fg = fear_greed()
-    SD.funding_series = lambda: fund
-    S.funding_series = lambda: fund
-    ML.funding_series = lambda: fund
-    ML.fng = lambda: fg
-
-    df1 = klines("1h", 90)
-    df4 = klines("4h", 3 * 365 + 400)
+def e0449_history(df1, df4):
+    """E0449 target on every 1h bar (current-window parameters; C3's history uses its MA primary as proxy)."""
     p1, p2, p3 = SEL["E0301"]["params"], SEL["E0292"]["params"], SEL["E0420"]["params"]
     c1 = S.REGISTRY["funding_level"](df1, **p1)["target"]
     c2_4 = pd.Series(S.REGISTRY["vol_regime"](df4, **p2)["target"], df4.index)
     c3_last, prob, prim = ml_meta_live(df4, int(p3["H"]), int(p3["fast"]), int(p3["slow"]), float(p3["thr"]))
     c3_4 = pd.Series(np.nan, df4.index); c3_4.iloc[-1] = c3_last[-1]
-    # history of C3 for the vol weights: use the primary (conservative proxy) for past bars
     c3_4 = c3_4.fillna(pd.Series(np.nan_to_num(S.sma(df4.close.to_numpy(), p3["fast"]) > S.sma(df4.close.to_numpy(), p3["slow"])).astype(float), df4.index))
-    c2 = to_1h(c2_4, df1.index)
-    c3 = to_1h(c3_4, df1.index)
-    T = np.vstack([c1, c2, c3])
+    T = np.vstack([c1, to_1h(c2_4, df1.index), to_1h(c3_4, df1.index)])
     r1 = df1.close.pct_change().fillna(0.0).to_numpy()
-    R = T[:, :-1] * r1[1:]                                    # component 1x hourly returns (cost-free proxy)
-    n = 24 * 60
-    vol = np.array([np.std(row[-n:]) for row in R])
+    R = T[:, :-1] * r1[1:]
+    vol = np.array([np.std(row[-24 * 60:]) for row in R])
     w = np.where(vol > 0, 1 / vol, 0.0)
     w = w / w.sum() if w.sum() > 0 else np.full(3, 1 / 3)
-    if SEL.get("E0449_weighting", "invvol") == "equal":
-        w = np.full(3, 1 / 3)
-    comb = float((w * T[:, -1]).sum())
-    tgt = round(comb / 0.25) * 0.25 * LEV
-    prev_comb = float((w * T[:, -2]).sum())
-    prev = round(prev_comb / 0.25) * 0.25 * LEV
+    hist = np.round((w[:, None] * T).sum(0) / 0.25) * 0.25 * LEV
+    info = {"funding_level": float(T[0, -1]), "vol_regime": float(T[1, -1]), "ml_meta": float(T[2, -1]),
+            "ml_prob": round(prob, 3), "ma_primary_long": prim, "weights": [round(float(x), 3) for x in w]}
+    return hist, info
+
+
+def combo_history(df1, df4, d1):
+    """E0528 combo long/short target on 1h bars: mean of the current window's 5 long combos (rounded to 0.25)
+    minus the short combo. Conditions come from src/combo.py on live 4h + daily bars (short side on the mirrored price)."""
+    import src.combo as CB
+    picks = json.loads((ROOT / "reports" / "combo_picks.json").read_text())["E0528"]
+    longs, shorts = picks["long"][-1][1], picks["short"][-1][1]
+    _, Ll = CB.library("4h", "long", df=df4, d=d1)
+    _, Ls = CB.library("4h", "short", df=df4, d=d1)
+    AND = lambda L, name: np.all([L[c] for c in name.split(" & ")], axis=0).astype(float)
+    lt = np.round(np.mean([AND(Ll, n) for n in longs], axis=0) / 0.25) * 0.25
+    st = -np.mean([AND(Ls, n) for n in shorts], axis=0)
+    tgt4 = pd.Series(lt + st, df4.index)
+    info = {"window": picks["long"][-1][0], "long_combos_true": {n: bool(AND(Ll, n)[-1]) for n in longs},
+            "short_combo_true": {n: bool(AND(Ls, n)[-1]) for n in shorts}}
+    return to_1h(tgt4, df1.index), info
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--capital", type=float, default=10_000.0, help="account equity in ₹ (Delta India wallet)")
+    ap.add_argument("--paper", action="store_true", help="append signal + hypothetical fill to signals/paper_log.csv")
+    ap.add_argument("--strategy", default="E0607", choices=["E0607", "E0449"],
+                    help="E0607 = best combination (combo L/S + E0449 blend, 1.75x, limit execution); E0449 = earlier finalist")
+    a = ap.parse_args()
+
+    fund = funding_history()
+    fg = fear_greed()
+    import src.combo as CB
+    for mod in (SD, S, ML, CB):
+        mod.funding_series = lambda: fund
+    ML.fng = lambda: fg
+    CB.fng = lambda: fg
+
+    df1 = klines("1h", 90)
+    df4 = klines("4h", 3 * 365 + 400)
+    d1 = klines("1d", 700)
+    h449, info449 = e0449_history(df1, df4)
+    if a.strategy == "E0449":
+        tgt_hist, info = h449, {"E0449": info449}
+        label = "E0449 ensemble (funding-level 1h + vol-regime 4h + ML-meta 4h), x2, market orders"
+        limit = False
+    else:
+        hc, infoc = combo_history(df1, df4, d1)
+        T = np.vstack([hc, h449])
+        r1 = df1.close.pct_change().fillna(0.0).to_numpy()
+        R = T[:, :-1] * r1[1:]
+        vol = np.array([np.std(row[-24 * 60:]) for row in R])
+        w = np.where(vol > 0, 1 / vol, 0.0)
+        w = w / w.sum() if w.sum() > 0 else np.full(2, 0.5)
+        tgt_hist = np.round((w[:, None] * T).sum(0) / 0.25) * 0.25 * 1.75
+        info = {"combo_LS": infoc, "combo_target_now": float(hc[-1]), "E0449": info449, "E0449_target_now": float(h449[-1]),
+                "blend_weights[combo,E0449]": [round(float(x), 3) for x in w]}
+        label = "E0607 best combination: inverse-vol blend of combo long/short (4h) and E0449 (1h), x1.75, maker-limit execution"
+        limit = True
+    tgt, prev = float(tgt_hist[-1]), float(tgt_hist[-2])
 
     tick = http("https://api.india.delta.exchange/v2/tickers/BTCUSD")["result"]
     px = float(tick["mark_price"])
     cap_usd = a.capital / INR_PER_USD_DELTA
     lots = math.floor(abs(tgt) * cap_usd / px / V.lot_btc + 1e-9)
     qty = lots * V.lot_btc * (1 if tgt >= 0 else -1)
-    if tgt > 0 and prev <= 0:
-        action = "BUY"
-    elif tgt == 0 and prev > 0:
-        action = "CLOSE"
-    elif tgt > prev:
-        action = "BUY (increase)"
-    elif tgt < prev:
-        action = "SELL (reduce)"
-    else:
+    if tgt == prev:
         action = "HOLD"
+    elif tgt == 0:
+        action = "CLOSE"
+    elif tgt > 0 and prev <= 0:
+        action = "BUY (open long)"
+    elif tgt < 0 and prev >= 0:
+        action = "SELL (open short)"
+    elif abs(tgt) > abs(prev):
+        action = "BUY (increase long)" if tgt > 0 else "SELL (increase short)"
+    else:
+        action = "SELL (reduce long)" if tgt > 0 else "BUY (reduce short)"
     liq = (qty * px - cap_usd) / (qty - V.mmr * abs(qty)) if qty else None
     last_bar = df1.index[-1]
+    last_close = float(df1.close.iloc[-1])
+    if action == "HOLD":
+        execute = "no order"
+    elif limit:
+        side = "BUY" if tgt > prev else "SELL"
+        execute = (f"LIMIT {side} at {last_close:.1f} (the last 1h close), good for 1 hour; if it is not filled by the next "
+                   f"hourly close, send a MARKET order at the following open (as backtested)")
+    else:
+        execute = "market order now (= open of the bar after the last closed bar)"
     out = {
         "generated_utc": pd.Timestamp.now(tz="UTC").isoformat(timespec="seconds"),
-        "strategy": "E0449 ensemble (funding-level 1h + vol-regime 4h + ML-meta 4h), x2, Delta India BTCUSD perp",
-        "last_closed_1h_bar_utc": str(last_bar), "btc_close": float(df1.close.iloc[-1]),
-        "components_now": {"funding_level": float(c1[-1]), "vol_regime": float(c2[-1]), "ml_meta": float(c3[-1]),
-                           "ml_prob": round(prob, 3), "ma_primary_long": prim, "weights": [round(float(x), 3) for x in w]},
+        "strategy": label,
+        "last_closed_1h_bar_utc": str(last_bar), "btc_close": last_close,
+        "components_now": info,
         "action": action, "target_leverage": tgt, "previous_target_leverage": prev,
         "position_btc": qty, "contracts_0.001BTC": lots, "position_notional_inr": round(abs(qty) * px * INR_PER_USD_DELTA),
         "capital_inr": a.capital, "mark_price_usd": px,
-        "stop_loss": "none in the tested rules (exit when the target changes); liquidation below",
+        "stop_loss": "none in the tested rules (exit when the target changes); liquidation price below",
         "take_profit": "none in the tested rules",
         "approx_liquidation_price_usd": round(liq, 1) if liq and liq > 0 else "n/a",
-        "execute": "market order now (= open of the bar after the last closed bar)" if action != "HOLD" else "no order",
+        "execute": execute,
         "next_check_utc": str(last_bar + pd.Timedelta("2h") + pd.Timedelta(seconds=30)),
         "note": ("target below one 0.001 BTC contract at this capital: stay flat" if tgt != 0 and lots == 0 else ""),
-        "warning": "Lockbox (2025-09-26→2026-09-26) result: -24.5%. Paper-trade only; see reports/final_report.md.",
+        "warning": "Backtest results are not a forecast. Paper-trade first (--paper); see reports/combo_report.md.",
     }
     for k, v in out.items():
         print(f"{k:>30}: {v}")
     if a.paper:
         log = ROOT / "signals" / "paper_log.csv"
-        row = {k: (json.dumps(v) if isinstance(v, (dict, list)) else v) for k, v in out.items()}
-        trade = action not in ("HOLD",)
+        row = {k: (json.dumps(v, default=str) if isinstance(v, (dict, list)) else v) for k, v in out.items()}
+        trade = action != "HOLD"
         side = np.sign(tgt - prev)
-        row["hypothetical_fill_price_usd"] = px * (1 + V.slippage * side) if trade else ""
-        row["hypothetical_fee_usd"] = abs(qty) * px * V.taker if trade else 0.0
+        if trade and limit:
+            row["hypothetical_fill_price_usd"] = last_close          # limit at the last close (verify fill next run)
+            row["hypothetical_fee_usd"] = abs(qty) * last_close * V.maker
+        else:
+            row["hypothetical_fill_price_usd"] = px * (1 + V.slippage * side) if trade else ""
+            row["hypothetical_fee_usd"] = abs(qty) * px * V.taker if trade else 0.0
         prev_rows = pd.read_csv(log) if log.exists() else pd.DataFrame()
         if len(prev_rows):
             last = prev_rows.iloc[-1]

@@ -21,6 +21,7 @@ from src.metrics import daily_returns, deflated_sharpe, pbo_cscv
 from src.strategies import REGISTRY, rvol, bpy
 import src.ml  # registers ML strategies
 import src.options  # registers options custom sim
+import src.combo_search  # registers combo_wf
 from src.venues import VENUES
 
 LB = EXP / "leaderboard.csv"
@@ -118,6 +119,16 @@ def kelly_scale(df, stitched, cfg_targets, sel, venue, cfg, simfn):
 
 
 def run(cfg, commit=True, verbose=True):
+    import src.backtest as BT
+    prev_exec = BT.EXEC["limit"]
+    BT.EXEC["limit"] = 1 if cfg.get("exec") == "limit" else 0      # "limit_eval": select at market cost, execute with limits
+    try:
+        return _run(cfg, commit, verbose)
+    finally:
+        BT.EXEC["limit"] = prev_exec
+
+
+def _run(cfg, commit=True, verbose=True):
     t0 = time.time()
     st = load_state()
     df = bars(cfg["tf"])
@@ -135,6 +146,9 @@ def run(cfg, commit=True, verbose=True):
                                  cfg.get("test_months", 6), simfn=simfn, trail=trail, band=band)
     if cfg.get("lev") == "kelly":
         stitched = kelly_scale(df, stitched, cts, sel, venue, cfg, simfn)
+    if cfg.get("exec") == "limit_eval":
+        import src.backtest as BT
+        BT.EXEC["limit"] = 1
     res = evaluate(df, stitched, venue, trail, band, simfn=simfn)
     res["stitched"], res["sel"], res["cands"] = stitched, sel, cts
     m = res["metrics"]

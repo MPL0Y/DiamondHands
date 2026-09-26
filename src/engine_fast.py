@@ -30,7 +30,7 @@ def _lots(x, lot):
 
 @njit(cache=True)
 def simulate(o, h, l, c, fund, tgt, stop, tp, trail, month_id, fx, lot, mmr, fee_t, fee_m, slip,
-             mode, e0_inr, band):
+             mode, e0_inr, band, exec_limit=0):
     n = len(o)
     eq = np.zeros(n)            # equity (USD) marked at close
     pos = np.zeros(n)           # units held during bar
@@ -60,6 +60,7 @@ def simulate(o, h, l, c, fund, tgt, stop, tp, trail, month_id, fx, lot, mmr, fee
     m0 = month_id[0]
     dead = False
     P = o[0]
+    pend = False       # limit order missed last bar -> market order this bar
     for t in range(n):
         # ---- mark to open
         if q != 0.0:
@@ -108,9 +109,23 @@ def simulate(o, h, l, c, fund, tgt, stop, tp, trail, month_id, fx, lot, mmr, fee
         if want_trade and E > 0:
             newq = _lots(d * E / o[t], lot)
             dq = newq - q
+            use_limit = exec_limit == 1 and t > 0 and not pend and not force
+            lim_fill = False
+            if dq != 0.0 and use_limit:
+                Lp = c[t - 1]
+                # pessimistic: fills only if the bar trades THROUGH the limit, at the limit price (no improvement)
+                lim_fill = (dq > 0 and l[t] < Lp * (1.0 - 1e-4)) or (dq < 0 and h[t] > Lp * (1.0 + 1e-4))
+                if not lim_fill:
+                    pend = True
+                    dq = 0.0
             if dq != 0.0:
-                px = o[t] * (1.0 + slip * np.sign(dq))
-                cost = abs(dq) * o[t] * slip + abs(dq) * px * fee_t
+                if lim_fill:
+                    px = Lp
+                    cost = abs(dq) * Lp * fee_m + dq * (Lp - o[t])   # fee + fill-vs-open mark difference
+                else:
+                    px = o[t] * (1.0 + slip * np.sign(dq))
+                    cost = abs(dq) * o[t] * slip + abs(dq) * px * fee_t
+                pend = False
                 # trade bookkeeping (close / flip)
                 if q != 0.0 and (newq == 0.0 or np.sign(newq) != np.sign(q)):
                     # closing leg cost share
@@ -138,7 +153,8 @@ def simulate(o, h, l, c, fund, tgt, stop, tp, trail, month_id, fx, lot, mmr, fee
                     tp_px = o[t] * (1.0 + g * np.sign(q)) if g > 0 else 0.0
                     ext = o[t]
                     tr_px = o[t] * (1.0 - trail * np.sign(q)) if trail > 0 else 0.0
-            last_exec = d
+            if not pend:
+                last_exec = d
         # ---- funding
         if q != 0.0 and fund[t] != 0.0:
             fc = q * o[t] * fund[t]

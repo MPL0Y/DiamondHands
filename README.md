@@ -34,7 +34,13 @@ python signals/generate_signal.py            # prints action, size in ₹ and BT
 python signals/generate_signal.py --paper    # also appends to signals/paper_log.csv (hypothetical fills)
 ```
 
-## Result in one paragraph
+## Best indicator combination (follow-up goal: maximise backtest profit)
+**E0607**: an inverse-vol blend of a walk-forward-selected indicator-combination long/short system (4h) and E0449,
+at 1.75x with maker-limit execution. On the full 2018-01 → 2026-09 walk-forward, ₹10,000 → **₹1.44 crore**
+(CAGR 119.6%, max DD 45.8%, no liquidation). Exact buy/sell rules, gates and caveats are in **`reports/combo_report.md`**.
+Live signal: `python signals/generate_signal.py` (defaults to E0607; `--strategy E0449` for the earlier finalist).
+
+## Result in one paragraph (original ₹1L/month goal)
 Best risk-compliant strategy (E0449, an ensemble of a funding filter, a vol-regime trend and an ML meta-label on
 Delta Exchange India's BTC perp at up to 2×): walk-forward OOS 2018–2025 median **₹142/month on ₹10,000**
 (CAGR 63%, max DD 49%, 0% of months ≥ ₹1L). Lockbox year: **−24.5%**. Capital needed for ₹1L/month at the OOS median ≈ ₹44 lakh.

@@ -8,7 +8,10 @@ from src.metrics import perf, daily_returns, max_dd, monte_carlo
 from src.config import START_CAPITAL_INR, OOS_START, DEV_END
 
 
-def sim(df, target, venue, mode=0, stop=None, tp=None, trail=0.0, band=0.0, lotfree=False, delay=0, lev_cap=None):
+EXEC = {"limit": 0}   # 1 = maker limit at the signal bar's close, pessimistic fill, market fallback next bar
+
+
+def sim(df, target, venue, mode=0, stop=None, tp=None, trail=0.0, band=0.0, lotfree=False, delay=0, lev_cap=None, exec_limit=None):
     """target: array aligned with df (signed leverage decided at bar close)."""
     n = len(df)
     tgt = np.asarray(target, float).copy()
@@ -24,7 +27,8 @@ def sim(df, target, venue, mode=0, stop=None, tp=None, trail=0.0, band=0.0, lotf
     lot = 1e-9 if lotfree else venue.lot_btc * venue.min_lots
     out = simulate(df.open.to_numpy(), df.high.to_numpy(), df.low.to_numpy(), df.close.to_numpy(), fund,
                    tgt, stp, tpp, float(trail), df.month_id.to_numpy(), df.fx.to_numpy(), lot, venue.mmr,
-                   venue.taker, venue.maker, venue.slippage, mode, START_CAPITAL_INR, float(band))
+                   venue.taker, venue.maker, venue.slippage, mode, START_CAPITAL_INR, float(band),
+                   EXEC["limit"] if exec_limit is None else int(exec_limit))
     eq, pos, m_pnl, m_liq, trades, nliq, fees, fundp, turn = out
     return {"eq": pd.Series(eq, df.index), "pos": pos, "m_pnl": m_pnl, "m_liq": m_liq, "trades": trades,
             "nliq": nliq, "fees": fees, "funding": fundp, "turnover": turn}

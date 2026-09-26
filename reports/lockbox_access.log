@@ -13,3 +13,60 @@ Sat Sep 26 03:56:58 UTC 2026 NOTE: after tag lockbox-freeze only src/build_lockb
 2026-09-26 03:58:06.714930+00:00 LOAD lockbox bars tf=4h
 2026-09-26 03:58:08.440644+00:00 LOAD lockbox bars tf=1d
 2026-09-26 04:00:35.552885+00:00 READ lockbox BTC first/last close for context in report
+2026-09-26 07:25:52.582635+00:00 POST-LOCKBOX (burned) evaluation of combo/blend strategies designed after the lockbox was spent; informative only
+2026-09-26 07:25:53.434130+00:00 LOAD lockbox bars tf=4h
+2026-09-26 07:25:54.703126+00:00 LOAD lockbox bars tf=1d
+2026-09-26 07:26:18.308787+00:00 LOAD lockbox bars tf=1h
+2026-09-26 07:26:53.030228+00:00 POST-LOCKBOX quick_eval (lot-free vs lots) of combo/blend strategies; informative only
+2026-09-26 07:26:57.814941+00:00 LOAD lockbox bars tf=4h
+2026-09-26 07:26:58.173812+00:00 LOAD lockbox bars tf=1d
+2026-09-26 07:27:07.394659+00:00 LOAD lockbox bars tf=1h
+2026-09-26 07:28:26.087611+00:00 FULL-PERIOD (2018-01..2026-09) walk-forward evaluation of candidates; lockbox already burned
+2026-09-26 07:28:26.295830+00:00 LOAD lockbox bars tf=4h
+2026-09-26 07:28:26.942816+00:00 LOAD lockbox bars tf=1d
+2026-09-26 07:28:33.535303+00:00 LOAD lockbox bars tf=1h
+2026-09-26 07:31:46.834931+00:00 FULL-PERIOD sweep ['E0555', 'E0557', 'E0558', 'E0559', 'E0563']
+2026-09-26 07:31:47.027659+00:00 LOAD lockbox bars tf=1h
+2026-09-26 07:31:47.170697+00:00 LOAD lockbox bars tf=4h
+2026-09-26 07:31:47.605358+00:00 LOAD lockbox bars tf=1d
+2026-09-26 07:34:06.053900+00:00 FULL-PERIOD sweep ['E0564', 'E0565', 'E0566', 'E0567', 'E0568', 'E0569', 'E0570', 'E0571', 'E0572']
+2026-09-26 07:34:06.273770+00:00 LOAD lockbox bars tf=1h
+2026-09-26 07:34:06.356105+00:00 LOAD lockbox bars tf=4h
+2026-09-26 07:34:06.840352+00:00 LOAD lockbox bars tf=1d
+2026-09-26 07:35:57.086218+00:00 LOAD lockbox bars tf=1h
+2026-09-26 07:35:57.250930+00:00 LOAD lockbox bars tf=4h
+2026-09-26 07:35:57.812561+00:00 LOAD lockbox bars tf=1d
+2026-09-26 07:37:55.856050+00:00 LOAD lockbox bars tf=1h
+2026-09-26 07:37:56.024873+00:00 LOAD lockbox bars tf=4h
+2026-09-26 07:37:56.453878+00:00 LOAD lockbox bars tf=1d
+2026-09-26 07:38:44.582862+00:00 LOAD lockbox bars tf=1h
+2026-09-26 07:38:44.742934+00:00 LOAD lockbox bars tf=4h
+2026-09-26 07:38:45.312904+00:00 LOAD lockbox bars tf=1d
+2026-09-26 07:41:52.565427+00:00 FULL-PERIOD sweep ['E0589', 'E0595', 'E0599', 'E0592']
+2026-09-26 07:41:52.791558+00:00 LOAD lockbox bars tf=4h
+2026-09-26 07:41:53.398046+00:00 LOAD lockbox bars tf=1d
+2026-09-26 07:42:16.264823+00:00 LOAD lockbox bars tf=1h
+2026-09-26 07:43:43.115320+00:00 FULL-PERIOD sweep ['E0603', 'E0604', 'E0605', 'E0606']
+2026-09-26 07:43:43.278459+00:00 LOAD lockbox bars tf=1h
+2026-09-26 07:43:43.356888+00:00 LOAD lockbox bars tf=4h
+2026-09-26 07:43:43.865436+00:00 LOAD lockbox bars tf=1d
+2026-09-26 07:55:46.349960+00:00 LOAD lockbox bars tf=4h
+2026-09-26 07:55:47.029459+00:00 LOAD lockbox bars tf=1d
+current-window selection of E0607 for signal generator (full data)
+2026-09-26 08:10:38.692687+00:00 LOAD lockbox bars tf=1h
+2026-09-26 08:10:38.756914+00:00 LOAD lockbox bars tf=4h
+2026-09-26 08:10:39.102690+00:00 LOAD lockbox bars tf=1d
+2026-09-26 08:28:15.778868+00:00 FULL-PERIOD report evaluation of E0607/E0608 (lockbox burned)
+2026-09-26 08:28:19.524494+00:00 LOAD lockbox bars tf=1h
+2026-09-26 08:28:19.762895+00:00 LOAD lockbox bars tf=4h
+2026-09-26 08:28:20.236258+00:00 LOAD lockbox bars tf=1d
+2026-09-26 08:28:54.232682+00:00 LOAD lockbox bars tf=1h
+2026-09-26 08:28:54.403535+00:00 LOAD lockbox bars tf=4h
+2026-09-26 08:28:54.945180+00:00 LOAD lockbox bars tf=1d
+2026-09-26 08:29:30.754272+00:00 FULL-PERIOD 1m engine replay E0607
+2026-09-26 08:29:31.564595+00:00 LOAD lockbox bars tf=1h
+2026-09-26 08:29:31.739893+00:00 LOAD lockbox bars tf=4h
+2026-09-26 08:29:32.267653+00:00 LOAD lockbox bars tf=1d
+2026-09-26 08:30:47.503605+00:00 LOAD lockbox bars tf=1h
+2026-09-26 08:30:47.680606+00:00 LOAD lockbox bars tf=4h
+2026-09-26 08:30:48.219030+00:00 LOAD lockbox bars tf=1d

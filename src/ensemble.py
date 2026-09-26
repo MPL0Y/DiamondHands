@@ -15,6 +15,7 @@ Combination schemes (the ensemble's walk-forward picks among them using prior da
 import json
 import numpy as np
 import pandas as pd
+from numba import njit
 
 from src.config import EXP
 from src.data import bars
@@ -26,13 +27,19 @@ def component_target(cid, tf_out):
     from src.experiment import build_targets, expand_grid
     from src.custom import CUSTOM
     cfg = json.loads((EXP / "configs" / f"{cid}.json").read_text())
-    if cfg["strategy"] in CUSTOM:
-        raise ValueError("custom sims cannot be ensemble components")
     df = bars(cfg["tf"])
     venue = VENUES[cfg.get("venue", "delta_india_perp")]
-    cts = build_targets(df, cfg, expand_grid(cfg.get("grid", {}), cfg.get("fixed", {})))
+    pl = expand_grid(cfg.get("grid", {}), cfg.get("fixed", {}))
+    simfn = None
+    if cfg["strategy"] in CUSTOM:
+        if cfg["strategy"] not in ("combo_wf", "ensemble"):
+            raise ValueError("only target-type custom sims can be ensemble components")
+        cts = CUSTOM[cfg["strategy"]]["build"](df, cfg, pl)
+        simfn = CUSTOM[cfg["strategy"]]["sim"]
+    else:
+        cts = build_targets(df, cfg, pl)
     st, _ = walk_forward(df, cts, venue, cfg.get("score", "median_month"), cfg.get("train_years", 3),
-                         cfg.get("test_months", 6), trail=cfg.get("trail", 0.0), band=cfg.get("band", 0.0))
+                         cfg.get("test_months", 6), simfn=simfn, trail=cfg.get("trail", 0.0), band=cfg.get("band", 0.0))
     t = pd.Series(st["target"], df.index)
     if cfg.get("lev") not in (None, "kelly"):
         t = t / float(cfg["lev"])            # components enter at unit exposure; the ensemble applies leverage
@@ -73,10 +80,36 @@ def ens_build(df, cfg, params_list):
             iv = 1.0 / np.where(vol > 0, vol, np.nan)
             wts = iv / np.nansum(iv, 0)
             tg = np.nansum(np.nan_to_num(wts, nan=1.0 / len(ids)) * T, 0)
+        if p.get("vol_target"):
+            # scale by target / realised vol of BTC (trailing 30 days of 1h returns, known at the bar close)
+            lr = np.log(df.close).diff()
+            rv = (lr.rolling(24 * 30, min_periods=24 * 10).std() * np.sqrt(24 * 365)).to_numpy()
+            sc = np.clip(np.nan_to_num(p["vol_target"] / rv, nan=0.0), 0.0, p.get("vt_cap", 2.0))
+            tg = tg * sc
         q = p.get("step", 0.25)
         tg = np.round(tg / q) * q                      # quantise to limit churn
+        if p.get("cadence"):
+            # only re-decide on bars that close on a multiple of `cadence` hours (e.g. 4 -> the 4h closes)
+            close_h = ((df.index + (df.index[1] - df.index[0])).hour).to_numpy()
+            upd = (close_h % int(p["cadence"])) == 0
+            tg = pd.Series(np.where(upd, tg, np.nan)).ffill().fillna(0.0).to_numpy()
+        if p.get("hyst"):
+            tg = _hysteresis(tg, float(p["hyst"]))
         L = float(p.get("lev", 1.0))
         out.append({"params": p, "arrays": {"target": tg * L, "stop": None, "tp": None}})
+    return out
+
+
+@njit(cache=True)
+def _hysteresis(tg, h):
+    """Adopt a new target only if it differs from the held one by >= h, or it is flat (0), or it flips side."""
+    out = np.zeros(len(tg))
+    cur = 0.0
+    for t in range(len(tg)):
+        x = tg[t]
+        if x == 0.0 or np.sign(x) != np.sign(cur) or abs(x - cur) >= h - 1e-12:
+            cur = x
+        out[t] = cur
     return out
 
 

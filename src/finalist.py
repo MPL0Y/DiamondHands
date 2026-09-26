@@ -18,7 +18,9 @@ from src.venues import VENUES
 
 
 def rebuild(cid):
+    import src.backtest as BT
     cfg = json.loads((EXP / "configs" / f"{cid}.json").read_text())
+    BT.EXEC["limit"] = 1 if cfg.get("exec") == "limit" else 0
     df = bars(cfg["tf"])
     venue = VENUES[cfg.get("venue", "delta_india_perp")]
     pl = expand_grid(cfg.get("grid", {}), cfg.get("fixed", {}))
@@ -29,6 +31,8 @@ def rebuild(cid):
                            cfg.get("test_months", 6), simfn=simfn, trail=cfg.get("trail", 0.0), band=cfg.get("band", 0.0))
     if cfg.get("lev") == "kelly":
         st = kelly_scale(df, st, cts, sel, venue, cfg, simfn)
+    if cfg.get("exec") == "limit_eval":
+        BT.EXEC["limit"] = 1
     return cfg, df, venue, pl, cts, st, sel, simfn
 
 
@@ -55,7 +59,12 @@ def plateau(cid):
             stp = {kk: (None if v is None else np.zeros(len(df))) for kk, v in st.items()}
             for (a, b), (_, j) in zip(windows(test_months=cfg.get("test_months", 6)), sel):
                 p = dict(pl[j]); p[k] = _perturb(p[k], f)
+                import src.backtest as BT
+                if cfg.get("exec") == "limit_eval":
+                    BT.EXEC["limit"] = 0          # selection is costed at market in this design
                 c = (custom["build"](df, cfg, [p]) if custom else build_targets(df, cfg, [p]))[0]
+                if cfg.get("exec") == "limit_eval":
+                    BT.EXEC["limit"] = 1          # ... and executed with limit orders
                 i1, i2 = df.index.searchsorted(a), df.index.searchsorted(b)
                 for kk in stp:
                     if stp[kk] is not None and c["arrays"].get(kk) is not None:
@@ -85,7 +94,10 @@ def engines_agree(cid, one_min=True):
     out = {}
     for mode, m in (("compound", 0), ("withdraw", 1)):
         f = sim(d, arr["target"], venue, m, arr.get("stop"), arr.get("tp"), tr, bd)
-        e = run_event(d, tgt, venue, mode, fx=d.fx, fund=d.fund if venue.funding else None, stops=stop, tps=tp, trail=tr, band=bd)
+        import src.backtest as BT
+        xl = BT.EXEC["limit"]
+        e = run_event(d, tgt, venue, mode, fx=d.fx, fund=d.fund if venue.funding else None, stops=stop, tps=tp, trail=tr, band=bd,
+                      exec_limit=xl)
         if m == 0:
             fv, ev = f["eq"].iloc[-1] * d.fx.iloc[-1], e["equity"].iloc[-1] * d.fx.iloc[-1]
         else:
@@ -93,7 +105,7 @@ def engines_agree(cid, one_min=True):
         out[mode] = {"fast": fv, "event": ev, "rel_diff": abs(fv - ev) / max(abs(fv), 1e-9)}
         if one_min:
             e1 = run_event(d, tgt, venue, mode, fx=d.fx, fund=d.fund if venue.funding else None, stops=stop, tps=tp,
-                           trail=tr, band=bd, sub_bars=one_minute())
+                           trail=tr, band=bd, sub_bars=one_minute(), exec_limit=xl)
             v1 = e1["equity"].iloc[-1] * d.fx.iloc[-1] if m == 0 else float(e1["months"].sum())
             out[mode]["event_1m"] = v1
             out[mode]["liq_1m"] = e1["liquidations"]
