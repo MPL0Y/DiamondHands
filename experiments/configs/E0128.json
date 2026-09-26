@@ -1,0 +1,26 @@
+{
+ "id": "E0128",
+ "family": "grid",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Grid trading: BTC mean-reverts intraday, so a grid of resting limit orders earns spacing minus maker fees per round trip. Trends are the risk, capped by a stop below the grid.",
+ "strategy": "grid",
+ "tf": "15m",
+ "grid": {
+  "spacing": [
+   0.005,
+   0.01,
+   0.02,
+   0.03
+  ],
+  "levels": [
+   3,
+   5,
+   10
+  ]
+ },
+ "fixed": {
+  "lev": 2,
+  "filter": "none"
+ }
+}
