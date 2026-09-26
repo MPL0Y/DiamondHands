@@ -1,0 +1,10 @@
+{
+ "id": "E0217",
+ "family": "benchmark",
+ "strategy": "hold",
+ "tf": "1d",
+ "lev": 2,
+ "venue": "delta_india_perp",
+ "band": 0.25,
+ "hypothesis": "[rerun of E0005 after FX fix] Benchmark: passive exposure sets the bar every active strategy must beat. venue=delta_india_perp lev=2 rebalance band=0.25"
+}
