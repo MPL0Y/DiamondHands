@@ -1,0 +1,26 @@
+{
+ "id": "E0435",
+ "family": "grid",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Grid 2: trend-filtered grids (run only above or below the daily SMA), wide spacing, few levels. Tests whether grid drawdowns are trend-driven and can be avoided.",
+ "strategy": "grid",
+ "tf": "15m",
+ "grid": {
+  "spacing": [
+   0.01,
+   0.02,
+   0.03,
+   0.05
+  ],
+  "levels": [
+   2,
+   3,
+   5
+  ]
+ },
+ "fixed": {
+  "lev": 0.3,
+  "filter": "none"
+ }
+}
