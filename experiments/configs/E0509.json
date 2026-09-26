@@ -1,0 +1,14 @@
+{
+ "id": "E0509",
+ "family": "options",
+ "strategy": "options",
+ "tf": "1h",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Options: BTC implied vol has historically exceeded realised vol (variance risk premium). Selling weekly OTM options on real Deribit prints collects premium in most weeks, which should give a high median month; crash weeks are the risk.",
+ "fixed": {
+  "structure": "put",
+  "delta": 0.1,
+  "lev": 1.0
+ }
+}
