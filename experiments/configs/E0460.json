@@ -1,0 +1,27 @@
+{
+ "id": "E0460",
+ "family": "ensemble",
+ "strategy": "ensemble",
+ "tf": "1h",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Ensemble: signals from different families (funding, vol-regime trend, supertrend, ML meta, daily MR) are weakly correlated. Averaging them should lift Sharpe and cut DD, allowing more leverage within limits and so a higher median month.",
+ "grid": {
+  "k": [
+   1,
+   2,
+   3
+  ]
+ },
+ "fixed": {
+  "components": [
+   "E0301",
+   "E0299",
+   "E0292",
+   "E0344",
+   "E0226"
+  ],
+  "weighting": "vote",
+  "lev": 1.0
+ }
+}
