@@ -1,0 +1,25 @@
+{
+ "id": "E0584",
+ "family": "ensemble",
+ "strategy": "ensemble",
+ "tf": "1h",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Execution: post a maker limit at the signal bar's close (fee 0.0236% vs ~0.11% taker+slippage). Fills only if the next bar trades >=1bp through the limit; otherwise a market order at the following open. Walk-forward selection also sees the lower costs. [limit-execution rerun of E0449]",
+ "grid": {
+  "weighting": [
+   "equal",
+   "invvol"
+  ]
+ },
+ "fixed": {
+  "components": [
+   "E0301",
+   "E0292",
+   "E0420"
+  ],
+  "lev": 2.0,
+  "step": 0.25
+ },
+ "exec": "limit"
+}
