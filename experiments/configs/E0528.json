@@ -1,0 +1,17 @@
+{
+ "id": "E0528",
+ "family": "combo",
+ "strategy": "combo_wf",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "Indicator combinations: AND of 1-3 conditions from a 76-condition library (trend/momentum/volatility/volume/funding/sentiment/calendar, own TF + daily). Walk-forward picks the top-k combos per 6-month window on prior data only and averages their positions. A mirrored short-side library covers bear markets.",
+ "tf": "4h",
+ "fixed": {
+  "long_metric": "return",
+  "long_k": 5,
+  "long_ty": 4,
+  "short_metric": "sortino",
+  "short_k": 1,
+  "short_ty": 4
+ }
+}
