@@ -1,0 +1,29 @@
+{
+ "id": "E0342",
+ "family": "grid",
+ "lev": 1.0,
+ "venue": "delta_india_perp",
+ "hypothesis": "[rerun of E0130 after FX fix] Grid trading: BTC mean-reverts intraday, so a grid of resting limit orders earns spacing minus maker fees per round trip. Trends are the risk, capped by a stop below the grid.",
+ "strategy": "grid",
+ "tf": "15m",
+ "grid": {
+  "spacing": [
+   0.005,
+   0.01,
+   0.02
+  ],
+  "levels": [
+   5,
+   10
+  ],
+  "sma_days": [
+   50,
+   100,
+   200
+  ]
+ },
+ "fixed": {
+  "lev": 1,
+  "filter": "above"
+ }
+}
